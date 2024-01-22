@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">ScreenMirror</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="main_fragment_label">Screen Mirror To Tesla</string>
+    <string name="portrait">portrait</string>
+    <string name="landscape">landscape</string>
+    <string name="urls_header">Visit following link in browser</string>
+    <string name="button_remote_control_on">Enable remote control</string>
+    <string name="button_remote_control_off">Disable remote control</string>
+    <string name="button_start">Start screen sharing</string>
+    <string name="button_stop">Stop screen sharing</string>
+    <string name="main_fragment">Screen Mirror To Tesla</string>
+    <string name="url_address">http://9.9.9.9:8080</string>
+    <string name="url_address_name">URL:</string>
+    <string name="dns_server">9.9.9.9</string>
+</resources>
