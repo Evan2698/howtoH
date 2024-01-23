@@ -26,10 +26,16 @@
 </div>
 
 <div class="container">
-    <img src="tesla.mjpeg" id="screen" class="image_screen"  alt="screen"/>
+    <!--<img src="tesla.mjpeg" id="screen" class="image_screen"  alt="screen"/> -->
+    <canvas id="screen" class="image_screen" style="background: #000;" >
+        Your browser sucks.
+    </canvas>
 </div>
 
 <script src="js/main.js"></script>
-
+<script>
+    var player = new MJPEG.Player("screen", window.location.host + "/tesla.mjpeg");
+    player.start();
+ </script>
 </body>
 </html>
