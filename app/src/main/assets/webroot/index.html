@@ -21,21 +21,16 @@
 </div>
 <div class="container">
     <div class="gap">
+        <button id="join" class="button" style="width: 120px; margin-left: 30px;">投屏</button>
         <button id="fullscreen" class="button" style="width: 120px; margin-left: 30px;">全屏</button>
     </div>
 </div>
 
 <div class="container">
-    <!--<img src="tesla.mjpeg" id="screen" class="image_screen"  alt="screen"/> -->
-    <canvas id="screen" class="image_screen" style="background: #000;" >
-        Your browser sucks.
-    </canvas>
+    <img id="screen" class="image_screen"></img>
 </div>
 
 <script src="js/main.js"></script>
-<script>
-    var player = new MJPEG.Player("screen", window.location.host + "/tesla.mjpeg");
-    player.start();
- </script>
+
 </body>
 </html>

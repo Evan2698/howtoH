@@ -17,12 +17,13 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import com.copyland.howtoh.http.JPEGCache
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
 
-class ScreenCapture private constructor(intent: Intent, context: Context) {
+class ScreenCapture private constructor(intent: Intent, context: Context): JPEGCache {
 
     companion object {
         private var TAG: String = ScreenCapture::class.java.simpleName
@@ -53,11 +54,13 @@ class ScreenCapture private constructor(intent: Intent, context: Context) {
     private lateinit var projectionManager: MediaProjectionManager
     private var virtualDisplay: VirtualDisplay? = null
     private lateinit var imageReader: ImageReader
+    @Volatile
     private var interrupt: Boolean = false
+
     private lateinit var handler: Handler
     private lateinit var looper: Looper
-    public var imageQueue: BlockingQueue<ByteArrayOutputStream> =
-        LinkedBlockingQueue<ByteArrayOutputStream>(1)
+    private var imageQueue: BlockingQueue<ByteArrayOutputStream> =
+        LinkedBlockingQueue<ByteArrayOutputStream>(2)
 
     init {
         this.intent = intent
@@ -128,6 +131,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context) {
         mediaProjection = null
         virtualDisplay = null
         looper!!.quit()
+        imageQueue.put(ByteArrayOutputStream())
     }
 
     private fun captureAction(reader: ImageReader) {
@@ -161,6 +165,19 @@ class ScreenCapture private constructor(intent: Intent, context: Context) {
         } catch (e: Exception) {
             Log.d(TAG, "process", e)
         }
+    }
+
+    override fun takeImageFromStream(): ByteArrayOutputStream {
+        var temp = ByteArrayOutputStream()
+        if (interrupt){
+            return temp
+        }
+        try {
+            temp = imageQueue.take()
+        }catch (e: Exception){
+            Log.d(TAG, "imageQueue take failed: ", e)
+        }
+        return temp
     }
 
 

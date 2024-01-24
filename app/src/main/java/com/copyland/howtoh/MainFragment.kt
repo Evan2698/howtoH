@@ -54,7 +54,7 @@ class MainFragment : Fragment() {
             if (appService != null){
                 if (!appService!!.isServerRunning()){
                     activity?.runOnUiThread {
-                        appService?.startService(intent!!, requireContext())
+                        appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE)
                         startVPN()
                     }
                 }

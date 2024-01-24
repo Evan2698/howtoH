@@ -16,7 +16,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.copyland.howtoh.MainActivity
 import com.copyland.howtoh.R
-import com.copyland.howtoh.mjpeg.MJPEGHServer
+import com.copyland.howtoh.http.HttpMiniServer
+
 import com.copyland.howtoh.screencapturer.ScreenCapture
 
 
@@ -40,8 +41,9 @@ class ScreenMirrorService : Service() {
 
         private const val PORT:Int = 8080
     }
-    private var server: MJPEGHServer? = null
+
     private var isRunning : Boolean = false
+    private var httpServer :HttpMiniServer? = null
 
 
     inner class MirrorServiceBinder : Binder() {
@@ -125,7 +127,7 @@ class ScreenMirrorService : Service() {
         this.sendServiceStatus(2)
     }
 
-    fun startService(intent: Intent, context: Context){
+    fun startService(intent: Intent, context: Context, landscape:Boolean){
         val cm  = resources.displayMetrics
         var widthPixel = cm.widthPixels
         var heightPixel = cm.heightPixels
@@ -138,22 +140,24 @@ class ScreenMirrorService : Service() {
             in 1081..2600 -> 4
             else -> 6
         }
-        val w = widthPixel / ratio
-        val h = heightPixel /ratio
-
+        var w = widthPixel / ratio
+        var h = heightPixel /ratio
+        if (landscape){
+            w = h.apply { h = w }
+        }
         Log.d("SM", "startS x=${cm.widthPixels}, y=${cm.heightPixels}," +
                 " X1=${w}, Y1=${h}")
-        this.server = MJPEGHServer(w, h, PORT, context)
-        this.server?.start()
+
         val k = ScreenCapture.builder(intent, context)
         k.start(w, h)
+        httpServer = HttpMiniServer(PORT, k)
+        httpServer?.start()
         isRunning = true
     }
 
     private fun stopService(){
-        if (this.server != null){
-            this.server?.stopService()
-            this.server = null
+        if (httpServer != null){
+            httpServer?.stop()
         }
         ScreenCapture.getInstance().stop()
         isRunning = false
