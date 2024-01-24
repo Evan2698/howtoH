@@ -254,7 +254,6 @@ public class VhostsService extends VpnService {
         if (executorService != null) executorService.shutdownNow();
         isRunning = false;
         cleanup();
-        stopSelf();
         LogUtils.d(TAG, "Stopping");
     }
 

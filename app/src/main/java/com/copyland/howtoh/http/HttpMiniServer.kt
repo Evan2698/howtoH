@@ -25,8 +25,7 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
     private val serverPort: Int
     private val imageCache: JPEGCache
     private val connections = Collections.synchronizedSet<WSConnection?>(LinkedHashSet())
-    private val waitObject = Object()
-    private var launchRoutine:Thread? = null
+
 
     @Volatile
     private var interrupted: Boolean = false
@@ -57,8 +56,9 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
                     connections += thisConnection
                     try {
                         for (frame in incoming) {
-                            frame as? Frame.Text ?: continue
-                            Log.d(TAG, frame.readText())
+                            if (interrupted){
+                                break
+                            }
                         }
                     } catch (e: Exception) {
                         Log.d(TAG, "websocket error", e)
@@ -77,8 +77,7 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
         this.interrupted = false
         httpServer.start(wait = false)
 
-        launchRoutine = Thread(Runnable {
-            val obj = Object()
+        Thread(Runnable {
             while (!this.interrupted){
                 val data = this.imageCache.takeImageFromStream()
                 if (data.size() == 0){
@@ -95,28 +94,21 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
                 }
                 sleepMillis(40)
             }
-        })
 
-        launchRoutine?.start()
+            Log.d("SM", "<------------------------------------------>")
+            Thread.sleep(1000)
+            httpServer.stop()
+            Thread.sleep(1000)
+        }).start()
     }
 
     private fun sleepMillis(timeout:Long) {
-        try {
-            waitObject.wait(timeout)
-        } catch (e: Exception) {
-            Log.d(TAG, "e", e)
+        runBlocking {
+            delay(timeout)
         }
     }
 
     public fun stop() {
         this.interrupted = true
-        Thread(Runnable{
-            waitObject.notifyAll()
-            sleep(500)
-            waitObject.notifyAll()
-            launchRoutine?.interrupt()
-            launchRoutine?.join()
-            httpServer.stop()
-        })
     }
 }

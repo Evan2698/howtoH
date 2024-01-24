@@ -257,6 +257,13 @@ class MainFragment : Fragment() {
                     VhostsService::class.java
                 ).setAction(VhostsService.ACTION_DISCONNECT)
             )
+
+            this.activity?.stopService(
+                Intent(
+                    this.context,
+                    VhostsService::class.java
+                ))
+
         }
     }
     private fun registerVPNLaunch(){
