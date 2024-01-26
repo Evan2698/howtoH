@@ -76,7 +76,7 @@ function unInitWebsocket() {
 
 function prepareImage(bytearray) {
     const blob = new Blob([bytearray], { type: "image/jpeg" });
-    if (imageQueue.length > 5) {
+    if (imageQueue.length > 8) {
         console.log("trigger empty blob!!!! ");
         imageQueue = [];
     }
@@ -86,7 +86,7 @@ function prepareImage(bytearray) {
 
 function registerDrawEvent() {
     if (!freshhandle) {
-        freshhandle = setInterval(drawImage, 36);
+        freshhandle = setInterval(drawImage, 32);
     }
 }
 
@@ -107,7 +107,6 @@ function drawImage() {
         streamCanvas.width = img.naturalWidth;
         streamCanvas.height = img.naturalHeight;
         urlCreator.revokeObjectURL(imageURL);
-        //console.log("delete: ", imageURL);
         imageURL = null;
         var srcRect = {
             x: 0, y: 0,
@@ -115,6 +114,7 @@ function drawImage() {
             height: img.naturalHeight
         };
         var dstRect = srcRect;
+        //var canvasContext = streamCanvas.getContext("2d");
         try {
             canvasContext.drawImage(img,
                 srcRect.x,
@@ -132,6 +132,7 @@ function drawImage() {
         }    
         img = null;
         blob = null;
+        //canvasContext = null;
     }
     img.src = imageURL;
 }
