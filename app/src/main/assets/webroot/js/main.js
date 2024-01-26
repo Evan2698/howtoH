@@ -6,10 +6,12 @@ let imageWebsocket = null;
 let urlCreator = window.URL || window.webkitURL;
 let imageQueue = [];
 let freshhandle;
+let canvasContext;
 function init() {
     mirrorButton = document.getElementById("join");
     fullButton = document.getElementById("fullscreen");
     streamCanvas = document.getElementById("screen");
+    canvasContext = streamCanvas.getContext("2d");
     registerEvents();
     registerDrawEvent();
 }
@@ -22,8 +24,10 @@ function unInit() {
     unInitWebsocket();
     mirrorButton = null;
     fullButton = null;
+    canvasContext = null;
     streamCanvas = null;
 }
+
 window.onbeforeunload = unInit;
 
 function registerEvents() {
@@ -76,7 +80,7 @@ function prepareImage(bytearray) {
         console.log("trigger empty blob!!!! ");
         imageQueue = [];
     }
-    console.log("image to queue: ", imageQueue.length);
+    //console.log("image to queue: ", imageQueue.length);
     imageQueue.push(blob);
 }
 
@@ -100,12 +104,11 @@ function drawImage() {
     var imageURL = urlCreator.createObjectURL(blob);
     var img = new Image();
     img.onload = function () {
-        var context = streamCanvas.getContext("2d");
         streamCanvas.width = img.naturalWidth;
         streamCanvas.height = img.naturalHeight;
         urlCreator.revokeObjectURL(imageURL);
-        console.log("delete: ", imageURL);
-
+        //console.log("delete: ", imageURL);
+        imageURL = null;
         var srcRect = {
             x: 0, y: 0,
             width: img.naturalWidth,
@@ -113,7 +116,7 @@ function drawImage() {
         };
         var dstRect = srcRect;
         try {
-            context.drawImage(img,
+            canvasContext.drawImage(img,
                 srcRect.x,
                 srcRect.y,
                 srcRect.width,
