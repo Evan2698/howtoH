@@ -92,6 +92,8 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
     }
 
     fun start(widthPixel: Int, heightPixel: Int) {
+        // reset the image queue for application restart.
+        this.imageQueue.clear()
         startActionLoop(widthPixel, heightPixel)
     }
 

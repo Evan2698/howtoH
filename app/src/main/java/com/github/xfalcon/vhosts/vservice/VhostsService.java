@@ -210,6 +210,7 @@ public class VhostsService extends VpnService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        LogUtils.d(TAG, "onStartCommand: " + startId);
         if (intent != null) {
             if (ACTION_DISCONNECT.equals(intent.getAction())) {
                 stopVService();
@@ -254,17 +255,20 @@ public class VhostsService extends VpnService {
         if (executorService != null) executorService.shutdownNow();
         isRunning = false;
         cleanup();
-        LogUtils.d(TAG, "Stopping");
+        LogUtils.d(TAG, "stopVService");
+        stopSelf();
     }
 
     @Override
     public void onRevoke() {
+        LogUtils.d(TAG, "onRevoke:");
         stopVService();
         super.onRevoke();
     }
 
     @Override
     public void onDestroy() {
+        LogUtils.d(TAG, "onDestroy:");
         stopVService();
         super.onDestroy();
     }
@@ -345,7 +349,7 @@ public class VhostsService extends VpnService {
                     ByteBuffer bufferFromNetwork = networkToDeviceQueue.poll();
                     if (bufferFromNetwork != null) {
                         bufferFromNetwork.flip();
-                        while (bufferFromNetwork.hasRemaining())
+                        while (bufferFromNetwork.hasRemaining() &&!Thread.interrupted())
                             try {
 //                                byte[] content = new byte[32];
 //                                int oldPosition = bufferFromNetwork.position();
@@ -377,6 +381,8 @@ public class VhostsService extends VpnService {
             } finally {
                 closeResources(vpnInput, vpnOutput);
             }
+
+            LogUtils.d(TAG, "VPN routine is END!!!!");
         }
     }
 

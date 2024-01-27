@@ -99,6 +99,7 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
             Thread.sleep(1000)
             httpServer.stop()
             Thread.sleep(1000)
+            Log.d("SM", "<-----------------HTTP STOP--------------->")
         }).start()
     }
 
