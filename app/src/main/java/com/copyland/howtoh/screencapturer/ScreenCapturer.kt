@@ -132,7 +132,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
         interrupt = true;
         mediaProjection = null
         virtualDisplay = null
-        looper!!.quit()
+        looper.quit()
         imageQueue.put(ByteArrayOutputStream())
     }
 

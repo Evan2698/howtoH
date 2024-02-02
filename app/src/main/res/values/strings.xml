@@ -14,4 +14,5 @@
     <string name="url_address">http://9.9.9.9:8080</string>
     <string name="url_address_name">URL:</string>
     <string name="dns_server">9.9.9.9</string>
+    <string name="accessibility_description">ScreenMirror</string>
 </resources>

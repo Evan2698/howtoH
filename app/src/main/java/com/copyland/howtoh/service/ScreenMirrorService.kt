@@ -129,17 +129,16 @@ class ScreenMirrorService : Service() {
 
     fun startService(intent: Intent, context: Context, landscape:Boolean){
         val cm  = resources.displayMetrics
-        var widthPixel = cm.widthPixels
-        var heightPixel = cm.heightPixels
-        var ratio = 1
-
-        ratio = when (widthPixel) {
+        val widthPixel = cm.widthPixels
+        val heightPixel = cm.heightPixels
+        val ratio = when (widthPixel) {
             in 0..480 -> 1
             in 481..720 -> 2
             in 721..1080 -> 3
             in 1081..2600 -> 4
             else -> 6
         }
+        RatioHolder.getInstance().setRatio(ratio*1.0f)
         var w = widthPixel / ratio
         var h = heightPixel /ratio
         if (landscape){

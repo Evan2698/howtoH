@@ -1,5 +1,6 @@
 package com.copyland.howtoh
 
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity.RESULT_OK
 import android.content.BroadcastReceiver
 import android.content.ComponentName
@@ -10,18 +11,22 @@ import android.content.ServiceConnection
 import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityManager
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.copyland.howtoh.databinding.FragmentMainBinding
+import com.copyland.howtoh.service.ClickAccessibilityService
 import com.copyland.howtoh.service.ScreenMirrorService
 import com.github.xfalcon.vhosts.vservice.VhostsService
+
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -238,6 +243,7 @@ class MainFragment : Fragment() {
         }else {
             startVPNService()
         }
+        isMouseClickServiceOpen()
     }
 
     private fun startVPNService(){
@@ -267,6 +273,41 @@ class MainFragment : Fragment() {
                 Log.d(TAG, "cancel the projection!")
             }
         }
+    }
+
+    private  fun isStartAccessibilityService(context: Context, name: String?): Boolean {
+        val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val serviceInfo =
+            am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
+        for (info in serviceInfo) {
+            val id = info.id
+            if (id.contains(name!!)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isMouseClickServiceOpen() {
+        val mouseClickServiceName = ".service.ClickAccessibilityService"
+        val isMouseClickServiceOpen = isStartAccessibilityService(this.requireContext(), mouseClickServiceName)
+        if (isMouseClickServiceOpen) {
+            Log.d(TAG, "mouse service is running")
+        } else {
+//            val intent = Intent(this.context, ClickAccessibilityService::class.java)
+//            this.activity?.startService(intent)
+            jumpToSettingPage()
+        }
+    }
+
+    private fun jumpToSettingPage() {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        startActivity(intent)
+    }
+
+    private fun stopMouseClickService(){
+        val intent = Intent(this.context, ClickAccessibilityService::class.java)
+        this.activity?.stopService(intent)
     }
 
 

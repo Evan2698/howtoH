@@ -1,25 +1,22 @@
 package com.copyland.howtoh.http
 
 import android.util.Log
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
 import io.ktor.server.application.install
+import io.ktor.server.engine.embeddedServer
 import io.ktor.server.http.content.staticResources
+import io.ktor.server.netty.Netty
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
+import io.ktor.websocket.readBytes
 import io.ktor.websocket.readText
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.annotations.Blocking
-import java.lang.Thread.sleep
 import java.time.Duration
 import java.util.Collections
-import kotlin.concurrent.thread
 
 class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
     private val serverPort: Int
@@ -55,10 +52,12 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
                     val thisConnection = WSConnection(this)
                     connections += thisConnection
                     try {
-                        for (frame in incoming) {
-                            if (interrupted){
+                        for (message in incoming) {
+                            if (interrupted) {
                                 break
                             }
+                            message as? Frame.Text ?: continue
+                            MessagePump.getInstance().dispatchMessage(message.readText())
                         }
                     } catch (e: Exception) {
                         Log.d(TAG, "websocket error", e)
@@ -78,17 +77,17 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
         httpServer.start(wait = false)
 
         Thread(Runnable {
-            while (!this.interrupted){
+            while (!this.interrupted) {
                 val data = this.imageCache.takeImageFromStream()
-                if (data.size() == 0){
+                if (data.size() == 0) {
                     break;
                 }
                 connections.forEach {
-                    try{
+                    try {
                         runBlocking {
                             it.session.send(Frame.Binary(true, data.toByteArray()))
                         }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         Log.d(TAG, "websocket send failed: ", e)
                     }
                 }
@@ -103,7 +102,7 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
         }).start()
     }
 
-    private fun sleepMillis(timeout:Long) {
+    private fun sleepMillis(timeout: Long) {
         runBlocking {
             delay(timeout)
         }
