@@ -38,14 +38,4 @@ class MessagePump {
             Log.d(TAG,  "coordinate x=$x, y=$y" )
         }
     }
-
-    private fun convertSignInt(
-        b1: kotlin.Byte,
-        b2: kotlin.Byte,
-        b3: kotlin.Byte,
-        b4: kotlin.Byte
-    ): Int {
-        return b4.toInt() shl 24 or (b3.toInt() and 0xFF shl 16) or (b2.toInt() and 0xFF shl 8) or (b1.toInt() and 0xFF)
-    }
-
 }

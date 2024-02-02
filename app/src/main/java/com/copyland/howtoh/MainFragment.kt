@@ -23,7 +23,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.copyland.howtoh.databinding.FragmentMainBinding
-import com.copyland.howtoh.service.ClickAccessibilityService
 import com.copyland.howtoh.service.ScreenMirrorService
 import com.github.xfalcon.vhosts.vservice.VhostsService
 
@@ -56,12 +55,11 @@ class MainFragment : Fragment() {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             val binder = service as ScreenMirrorService.MirrorServiceBinder
             appService = binder.service
-            if (appService != null){
-                if (!appService!!.isServerRunning()){
-                    activity?.runOnUiThread {
-                        appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE)
-                        startVPN()
-                    }
+            if (!appService!!.isServerRunning()){
+                activity?.runOnUiThread {
+                    appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE)
+                    startVPN()
+                    checkMouseClickServiceOpen()
                 }
             }
         }
@@ -243,7 +241,6 @@ class MainFragment : Fragment() {
         }else {
             startVPNService()
         }
-        isMouseClickServiceOpen()
     }
 
     private fun startVPNService(){
@@ -288,14 +285,12 @@ class MainFragment : Fragment() {
         return false
     }
 
-    private fun isMouseClickServiceOpen() {
+    private fun checkMouseClickServiceOpen() {
         val mouseClickServiceName = ".service.ClickAccessibilityService"
         val isMouseClickServiceOpen = isStartAccessibilityService(this.requireContext(), mouseClickServiceName)
         if (isMouseClickServiceOpen) {
             Log.d(TAG, "mouse service is running")
         } else {
-//            val intent = Intent(this.context, ClickAccessibilityService::class.java)
-//            this.activity?.startService(intent)
             jumpToSettingPage()
         }
     }
@@ -304,11 +299,4 @@ class MainFragment : Fragment() {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
         startActivity(intent)
     }
-
-    private fun stopMouseClickService(){
-        val intent = Intent(this.context, ClickAccessibilityService::class.java)
-        this.activity?.stopService(intent)
-    }
-
-
 }

@@ -133,7 +133,7 @@ function drawImage() {
 
         } catch (e) {
             console.log("draw image failed", e);
-        }    
+        }
         img = null;
         blob = null;
         //canvasContext = null;
@@ -141,12 +141,12 @@ function drawImage() {
     img.src = imageURL;
 }
 
-function mouseInit(){
-  remoteVideoRect = document.getElementById('screen');
-  remoteVideoRect.addEventListener('mousedown', mouseDownHandler);
-  remoteVideoRect.addEventListener('mouseup', mouseUpHandler);
+function mouseInit() {
+    remoteVideoRect = document.getElementById('screen');
+    remoteVideoRect.addEventListener('mousedown', mouseDownHandler);
+    remoteVideoRect.addEventListener('mouseup', mouseUpHandler);
 }
-function mouseUninit(){
+function mouseUninit() {
     remoteVideoRect.removeEventListener('mouseup', mouseUpHandler);
     remoteVideoRect.removeEventListener('mousedown', mouseDownHandler);
 }
@@ -170,7 +170,7 @@ function getPosition(e) {
     x = Math.round(x * e.target.width * 1.0 / e.target.clientWidth);
     y = Math.round(y * e.target.height * 1.0 / e.target.clientHeight);
 
-    return {x, y};
+    return { x, y };
 }
 
 
@@ -178,34 +178,18 @@ function mouseHandler(e, action) {
     let position = getPosition(e);
     var msg = codingPosition(position);
     sendMouseMessage(msg);
-    console.log("x=" + position.x+ " y=" + position.y);
+    //console.log("x=" + position.x + " y=" + position.y);
 }
 
-function codingPosition(position){
-//var buffer = new ArrayBuffer(9);
-//var value = position.x;
-//buffer[0] = 0x45;
-//buffer[1] = (value >> 24) & 0xff;
-//buffer[2] = (value >> 16) & 0xff;
-//buffer[3] = (value >> 8) & 0xff;
-//buffer[4] = value & 0xff;
-//
-//var value = position.y;
-//buffer[5] = (value >> 24) & 0xff;
-//buffer[6] = (value >> 16) & 0xff;
-//buffer[7] = (value >> 8) & 0xff;
-//buffer[8] = value & 0xff;
-//return buffer
-
-return position.x + "," + position.y;
-
+function codingPosition(position) {
+    return position.x + "," + position.y;
 }
 
 function sendMouseMessage(message) {
     if (imageWebsocket == null)
         return;
 
-     var msg = message;
+    var msg = message;
 
     imageWebsocket.send(msg);
 }

@@ -1,5 +1,6 @@
 package com.copyland.howtoh.service
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,16 +9,12 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
-
 import android.os.IBinder
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.copyland.howtoh.MainActivity
 import com.copyland.howtoh.R
 import com.copyland.howtoh.http.HttpMiniServer
-
 import com.copyland.howtoh.screencapturer.ScreenCapture
 
 
@@ -80,6 +77,7 @@ class ScreenMirrorService : Service() {
     }
 
 
+    @SuppressLint("LaunchActivityFromNotification")
     private fun start() {
 
         val notificationIntent = Intent(this, MainActivity::class.java)
@@ -90,7 +88,7 @@ class ScreenMirrorService : Service() {
             notificationIntent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val channelId =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) createNotificationChannel() else ""
+            createNotificationChannel()
         val notificationBuilder: NotificationCompat.Builder = NotificationCompat.Builder(
             this,
             channelId
@@ -110,7 +108,6 @@ class ScreenMirrorService : Service() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(): String {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,

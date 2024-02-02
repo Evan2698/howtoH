@@ -9,10 +9,11 @@ android {
 
     defaultConfig {
         applicationId = "com.copyland.howtoh"
-        minSdk = 33
+        minSdk = 26
+        //noinspection OldTargetApi
         targetSdk = 33
         versionCode = 1
-        versionName = "1.1"
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

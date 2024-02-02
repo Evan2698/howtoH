@@ -69,7 +69,7 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
             <meta-data
-                android:name="android.accessibilityservice"
+                android:name="android.accessibility-service"
                 android:resource="@xml/text_server_config"/>
         </service>
 
