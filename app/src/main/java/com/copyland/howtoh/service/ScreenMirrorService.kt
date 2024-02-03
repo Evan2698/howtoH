@@ -22,10 +22,10 @@ class ScreenMirrorService : Service() {
 
     companion object {
         private val TAG:String = ScreenMirrorService::class.java.simpleName
-        public const val SERVICE_STOP_ACTION = "stop-action"
-        public const val SERVICE_START_ACTION = "start-action"
-        public const val SERVICE_STATUS = "SERVICE_STATUS"
-        public const val SERVICE_STATUS_ACTION = "SERVICE_STATUS_ACTION"
+        const val SERVICE_STOP_ACTION = "stop-action"
+        const val SERVICE_START_ACTION = "start-action"
+        const val SERVICE_STATUS = "SERVICE_STATUS"
+        const val SERVICE_STATUS_ACTION = "SERVICE_STATUS_ACTION"
 
         private const val SERVICE_ID = 102
         private const val NOTIFICATION_CHANNEL_ID = "ScreenMirrorServiceChannel"
@@ -33,7 +33,7 @@ class ScreenMirrorService : Service() {
         private const val NOTIFICATION_TITLE = "Screen Mirror is running"
         private const val NOTIFICATION_CONTENT = "Tap to stop"
 
-        public var IsServiceRunning = false
+        var IsServiceRunning = false
             private set
 
         private const val PORT:Int = 8080
@@ -50,7 +50,7 @@ class ScreenMirrorService : Service() {
 
     private val iBinder: IBinder = MirrorServiceBinder()
 
-    override fun onBind(intent: Intent?): IBinder? {
+    override fun onBind(intent: Intent?): IBinder {
         return iBinder
     }
 
