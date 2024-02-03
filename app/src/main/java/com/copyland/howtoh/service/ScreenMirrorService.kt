@@ -135,7 +135,7 @@ class ScreenMirrorService : Service() {
             in 1081..2600 -> 4
             else -> 6
         }
-        RatioHolder.getInstance().setRatio(ratio*1.0f)
+
         var w = widthPixel / ratio
         var h = heightPixel /ratio
         if (landscape){
@@ -144,6 +144,9 @@ class ScreenMirrorService : Service() {
         Log.d("SM", "startS x=${cm.widthPixels}, y=${cm.heightPixels}," +
                 " X1=${w}, Y1=${h}")
 
+        var real:Float = widthPixel.toFloat()
+        real /= w
+        RatioHolder.getInstance().setRatio(real)
         val k = ScreenCapture.builder(intent, context)
         k.start(w, h)
         httpServer = HttpMiniServer(PORT, k)
