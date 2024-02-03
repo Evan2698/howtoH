@@ -189,8 +189,10 @@ function sendMouseMessage(message) {
     if (imageWebsocket == null)
         return;
 
-    var msg = message;
-
-    imageWebsocket.send(msg);
+    if (imageWebsocket.readyState === WebSocket.OPEN){
+        var msg = message;
+        imageWebsocket.send(msg);
+        //console.log(msg);
+    }
 }
 

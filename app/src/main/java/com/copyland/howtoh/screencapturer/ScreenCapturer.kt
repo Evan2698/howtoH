@@ -159,7 +159,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
             val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
             bitmap.recycle()
             val boss = ByteArrayOutputStream()
-            newBitmap.compress(Bitmap.CompressFormat.JPEG, 70, boss)
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 80, boss)
             boss.flush()
             newBitmap.recycle()
             imageQueue.put(boss)

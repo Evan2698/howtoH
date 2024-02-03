@@ -34,7 +34,7 @@ class ClickAccessibilityService: AccessibilityService(), ActionHandler {
         path.moveTo(xFloat.toFloat(), yFloat.toFloat())
         val builder = GestureDescription.Builder()
         val gestureDescription = builder
-            .addStroke(GestureDescription.StrokeDescription(path, 0, 1))
+            .addStroke(GestureDescription.StrokeDescription(path, 0, 10))
             .build()
         val result = dispatchGesture(gestureDescription, object :GestureResultCallback(){
             override fun onCompleted(gestureDescription: GestureDescription?) {
@@ -49,7 +49,7 @@ class ClickAccessibilityService: AccessibilityService(), ActionHandler {
 
         }, null)
 
-        Log.i(TAG,"dispatch gesture: $result, x = $x, y = $y")
+        Log.i(TAG,"dispatch gesture: $result, x = $xFloat, y = $yFloat")
     }
 
 }

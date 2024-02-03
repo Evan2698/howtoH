@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import com.copyland.howtoh.databinding.FragmentMainBinding
 import com.copyland.howtoh.service.ScreenMirrorService
 import com.github.xfalcon.vhosts.vservice.VhostsService
+import kotlinx.coroutines.runBlocking
 
 
 /**
@@ -59,7 +60,6 @@ class MainFragment : Fragment() {
                 activity?.runOnUiThread {
                     appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE)
                     startVPN()
-                    checkMouseClickServiceOpen()
                 }
             }
         }
@@ -241,6 +241,10 @@ class MainFragment : Fragment() {
         }else {
             startVPNService()
         }
+
+        runBlocking {
+            checkMouseClickServiceOpen()
+        }
     }
 
     private fun startVPNService(){
@@ -275,7 +279,7 @@ class MainFragment : Fragment() {
     private  fun isStartAccessibilityService(context: Context, name: String?): Boolean {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
         val serviceInfo =
-            am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC)
+            am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
         for (info in serviceInfo) {
             val id = info.id
             if (id.contains(name!!)) {

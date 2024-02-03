@@ -63,13 +63,14 @@
 
         <service android:name=".service.ClickAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="true"
+            android:exported="false"
+            android:canPerformGestures="true"
             android:label="@string/accessibility_description">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
             <meta-data
-                android:name="android.accessibility-service"
+                android:name="android.accessibilityservice"
                 android:resource="@xml/text_server_config"/>
         </service>
 
