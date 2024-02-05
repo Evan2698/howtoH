@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>TESLA Screen Projection</title>
     <link rel="icon" type="icon" sizes="192x192" href="img/favicon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
@@ -14,23 +14,28 @@
 
 <body>
 
-<div class="container">
-    <div class="title">
-        SCREEN TO TΞSLA
+    <div class="container">
+        <div class="title">
+            SCREEN TO TΞSLA
+        </div>
     </div>
-</div>
-<div class="container">
-    <div class="gap">
-        <button id="join" class="button" style="width: 120px; margin-left: 30px;">投屏</button>
-        <button id="fullscreen" class="button" style="width: 120px; margin-left: 30px;">全屏</button>
+    <div class="container">
+        <div class="gap">
+            <button id="join" class="button" style="width: 120px; margin-left: 30px;">投屏</button>
+            <button id="fullscreen" class="button" style="width: 120px; margin-left: 30px;">全屏</button>
+        </div>
     </div>
-</div>
 
-<div class="container">
-    <canvas id="screen" class="image_screen"></canvas>
-</div>
+    <div class="container">
+        <div class="gap">
+            <img class="child" src="img/home.svg" style="width:50px; height:50px; visibility:hidden" id="home" />
+            <canvas id="screen" class="image_screen"></canvas>
+            <img class="child" src="img/back.svg" style="width:50px; height:50px; visibility:hidden" id="back" />
+        </div>
+    </div>
 
-<script src="js/main.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
+
 </html>

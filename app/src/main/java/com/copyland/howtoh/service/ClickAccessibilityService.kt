@@ -2,6 +2,7 @@ package com.copyland.howtoh.service
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.GestureDescription
+import android.content.res.Resources
 import android.graphics.Path
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
@@ -27,9 +28,15 @@ class ClickAccessibilityService: AccessibilityService(), ActionHandler {
         // 辅助功能中断时执行的操作
     }
 
-    override fun click(x:Int, y:Int){
-        val xFloat = x * RatioHolder.getInstance().getRatio()
-        val yFloat = y * RatioHolder.getInstance().getRatio()
+    override fun click(x:Double, y:Double){
+        val xFloat = x / RatioHolder.getInstance().realWidth *
+                RatioHolder.getInstance().screenWidth
+        var yFloat = y / RatioHolder.getInstance().realHeight *
+                RatioHolder.getInstance().screenHeight
+
+        val cm = Resources.getSystem().displayMetrics
+        Log.d(TAG, "current X=$xFloat, Y=$yFloat, Screen X= ${cm.widthPixels}, Y=${cm.heightPixels}, dip=${cm.densityDpi}")
+
         val path = Path()
         path.moveTo(xFloat.toFloat(), yFloat.toFloat())
         val builder = GestureDescription.Builder()
@@ -52,4 +59,10 @@ class ClickAccessibilityService: AccessibilityService(), ActionHandler {
         Log.i(TAG,"dispatch gesture: $result, x = $xFloat, y = $yFloat")
     }
 
+    override fun key(value: String){
+        when(value){
+            "H"->performGlobalAction(GLOBAL_ACTION_HOME)
+            "B"->performGlobalAction(GLOBAL_ACTION_BACK)
+        }
+    }
 }

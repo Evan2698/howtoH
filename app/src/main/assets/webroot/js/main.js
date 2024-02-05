@@ -37,16 +37,28 @@ window.onbeforeunload = unInit;
 function registerEvents() {
     mirrorButton.addEventListener("click", onMirrorButtonClick);
     fullButton.addEventListener("click", onFullButtonClick);
+    var homeButton = document.getElementById("home");
+    homeButton.addEventListener("click", onHomeKeyClick);
+    var backButton = document.getElementById("back");
+    backButton.addEventListener("click", onBackKeyClick);
 }
 
 function removeEvents() {
-    mirrorButton.addEventListener("click", null);
-    fullButton.addEventListener("click", null);
+    mirrorButton.removeEventListener("click", onMirrorButtonClick);
+    fullButton.removeEventListener("click", onFullButtonClick);
+    var homeButton = document.getElementById("home");
+    homeButton.removeEventListener("click", onHomeKeyClick);
+    var backButton = document.getElementById("back");
+    backButton.removeEventListener("click", onBackKeyClick);
 }
 
 function onMirrorButtonClick(event) {
     unInitWebsocket();
     initWebsocket();
+    var home = document.getElementById("home");
+    home.style.visibility = "visible";
+    var back = document.getElementById("back");
+    back.style.visibility = "visible";
 }
 
 function onFullButtonClick(event) {
@@ -60,6 +72,21 @@ function toggleFullScreen() {
     } else {
         console.log("ok");
     }
+}
+
+function onHomeKeyClick(event) {
+    var h = codingKey("H");
+    sendMouseMessage(h);
+
+}
+
+function onBackKeyClick(event) {
+    var h = codingKey("B");
+    sendMouseMessage(h);
+}
+
+function codingKey(key) {
+    return "K," + key + ",0";
 }
 
 function initWebsocket() {
@@ -164,12 +191,28 @@ function mouseUpHandler(e) {
 
 function getPosition(e) {
     let rect = e.target.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    let x1 = e.clientX - rect.left;
+    let y1 = e.clientY - rect.top;
+    let x = 1.0;
+    let y = 1.0;
 
-    x = Math.round(x * e.target.width * 1.0 / e.target.clientWidth);
-    y = Math.round(y * e.target.height * 1.0 / e.target.clientHeight);
-
+    if (e.target.clientWidth >= e.target.clientHeight) {
+        var aspect = 1.0 * e.target.width / e.target.height;
+        y = e.target.height / e.target.clientHeight * y1;
+        var pictureWidth = e.target.clientHeight * aspect;
+        var offset = (e.target.clientWidth - pictureWidth) / 2;
+        var xValue = x1 - offset;
+        x = xValue * e.target.width / pictureWidth;
+    } else {
+        x = e.target.width / e.target.clientWidth * x1;
+        var aspect = 1.0 * e.target.height / e.target.width;
+        var pictureHeight = e.target.clientWidth * aspect;
+        var offset = (e.target.clientHeight - pictureHeight) / 2;
+        var yValue = y1 - offset;
+        y = yValue * e.target.height / pictureHeight;
+    }
+    // console.log("x=" + x + ", width:" + e.target.clientWidth + "  x1=" + x1 + " rw:" + e.target.width);
+    // console.log("y=" + y + ", height:" + e.target.clientHeight + "  y1=" + y1 + " rh:" + e.target.height);
     return { x, y };
 }
 
@@ -178,18 +221,17 @@ function mouseHandler(e, action) {
     let position = getPosition(e);
     var msg = codingPosition(position);
     sendMouseMessage(msg);
-    //console.log("x=" + position.x + " y=" + position.y);
 }
 
 function codingPosition(position) {
-    return position.x + "," + position.y;
+    return "M," + position.x + "," + position.y;
 }
 
 function sendMouseMessage(message) {
     if (imageWebsocket == null)
         return;
 
-    if (imageWebsocket.readyState === WebSocket.OPEN){
+    if (imageWebsocket.readyState === WebSocket.OPEN) {
         var msg = message;
         imageWebsocket.send(msg);
         //console.log(msg);

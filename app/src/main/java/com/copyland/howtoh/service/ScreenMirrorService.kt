@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.util.DisplayMetrics
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.copyland.howtoh.MainActivity
@@ -124,10 +125,12 @@ class ScreenMirrorService : Service() {
         this.sendServiceStatus(2)
     }
 
-    fun startService(intent: Intent, context: Context, landscape:Boolean){
-        val cm  = resources.displayMetrics
+    fun startService(intent: Intent, context: Context, landscape:Boolean,
+                     cm:DisplayMetrics){
         val widthPixel = cm.widthPixels
         val heightPixel = cm.heightPixels
+        RatioHolder.getInstance().screenHeight = heightPixel.toDouble()
+        RatioHolder.getInstance().screenWidth = widthPixel.toDouble()
         val ratio = when (widthPixel) {
             in 0..480 -> 1
             in 481..720 -> 2
@@ -135,18 +138,15 @@ class ScreenMirrorService : Service() {
             in 1081..2600 -> 4
             else -> 6
         }
-
         var w = widthPixel / ratio
         var h = heightPixel /ratio
+        RatioHolder.getInstance().realWidth = w.toDouble()
+        RatioHolder.getInstance().realHeight = h.toDouble()
         if (landscape){
             w = h.apply { h = w }
         }
         Log.d("SM", "startS x=${cm.widthPixels}, y=${cm.heightPixels}," +
                 " X1=${w}, Y1=${h}")
-
-        var real:Float = widthPixel.toFloat()
-        real /= w
-        RatioHolder.getInstance().setRatio(real)
         val k = ScreenCapture.builder(intent, context)
         k.start(w, h)
         httpServer = HttpMiniServer(PORT, k)

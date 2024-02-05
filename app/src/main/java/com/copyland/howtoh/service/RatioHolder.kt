@@ -17,13 +17,10 @@ class RatioHolder {
         }
     }
 
-    private var ratio:Float = 1.0f
+    var realWidth: Double = 1.0
 
-    public fun setRatio(r :Float){
-        ratio = r
-    }
+    var realHeight: Double = 1.0
 
-    public fun getRatio():Float{
-        return ratio
-    }
+    var screenWidth: Double = 1.0
+    var screenHeight: Double = 1.0
 }

@@ -28,14 +28,30 @@ class MessagePump {
     }
     fun dispatchMessage(msg: String){
         if (msg.isEmpty()) return
-        Log.d(TAG, "byteArray is ${msg.toString()}")
-        val xy = msg.split(",")
-        if(xy.isEmpty() || xy.size < 2) return
-        val x = xy[0].toInt()
-        val y = xy[1].toInt()
+        try {
+            Log.d(TAG, "byteArray is ${msg.toString()}")
+            val xy = msg.split(",")
+            if(xy.isEmpty() || xy.size < 3) return
+            when(xy[0]){
+                "M"->handleMouse(xy[1].toDouble(), xy[2].toDouble())
+                "K"->handleKey(xy[1])
+            }
+        }catch (e:Exception){
+            Log.d(TAG, "what", e)
+        }
+    }
+
+    private fun handleMouse(x:Double, y:Double){
         if (this.handler != null){
             this.handler!!.click(x, y)
             Log.d(TAG,  "coordinate x=$x, y=$y" )
+        }
+    }
+
+    private fun handleKey(key:String){
+        if (this.handler != null){
+            this.handler!!.key(key)
+            Log.d(TAG,  "key click: $key" )
         }
     }
 }

@@ -12,6 +12,7 @@ import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -50,6 +51,7 @@ class MainFragment : Fragment() {
     private var requestVpnLauncher: ActivityResultLauncher<Intent>? = null
     private var serviceConnection: AppServiceConnection? = null
     private var myCast :MyBroadcastReceiver? = null
+    private var cm: DisplayMetrics = DisplayMetrics()
 
 
     private inner class AppServiceConnection : ServiceConnection {
@@ -58,7 +60,7 @@ class MainFragment : Fragment() {
             appService = binder.service
             if (!appService!!.isServerRunning()){
                 activity?.runOnUiThread {
-                    appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE)
+                    appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE, cm)
                     startVPN()
                 }
             }
@@ -115,15 +117,14 @@ class MainFragment : Fragment() {
         binding.startButton.setOnCheckedChangeListener { _, isChecked ->
             buttonChecked = isChecked
         }
-
-
         binding.landscapeId.setOnClickListener{
             LANDSCAPE_VALUE = true
         }
         binding.portraitId.setOnClickListener {
             LANDSCAPE_VALUE = false
         }
-
+        // just for api 26
+        this.requireActivity().windowManager.defaultDisplay.getRealMetrics(cm)
     }
 
     override fun onDestroyView() {
