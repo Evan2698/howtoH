@@ -29,7 +29,7 @@ class MessagePump {
     fun dispatchMessage(msg: String){
         if (msg.isEmpty()) return
         try {
-            Log.d(TAG, "byteArray is ${msg.toString()}")
+            Log.d(TAG, "byteArray is $msg")
             val xy = msg.split(",")
             if(xy.isEmpty() || xy.size < 3) return
             when(xy[0]){

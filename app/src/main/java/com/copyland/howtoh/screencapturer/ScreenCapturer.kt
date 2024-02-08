@@ -60,7 +60,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
     private lateinit var handler: Handler
     private lateinit var looper: Looper
     private var imageQueue: BlockingQueue<ByteArrayOutputStream> =
-        LinkedBlockingQueue<ByteArrayOutputStream>(2)
+        LinkedBlockingQueue(2)
 
     init {
         this.intent = intent
@@ -73,19 +73,8 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
             this.context.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                     as MediaProjectionManager
 
-        mediaProjection = projectionManager.getMediaProjection(RESULT_OK, this.intent);
+        mediaProjection = projectionManager.getMediaProjection(RESULT_OK, this.intent)
         mediaProjection?.registerCallback(object : Callback() {
-            override fun onStop() {
-                super.onStop()
-            }
-
-            override fun onCapturedContentResize(width: Int, height: Int) {
-                super.onCapturedContentResize(width, height)
-            }
-
-            override fun onCapturedContentVisibilityChanged(isVisible: Boolean) {
-                super.onCapturedContentVisibilityChanged(isVisible)
-            }
 
         }, null)
 
@@ -112,7 +101,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
     }
 
     private fun startActionLoop(widthPixel: Int, heightPixel: Int){
-        Thread(Runnable{
+        Thread{
             Looper.prepare()
             looper = Looper.myLooper()!!
             handler = Handler(looper, object :Callback(), Handler.Callback {
@@ -123,13 +112,13 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
             })
             makeCapture(widthPixel, heightPixel)
             Looper.loop()
-        }).start()
+        }.start()
     }
 
     fun stop() {
         mediaProjection?.stop()
         virtualDisplay?.release()
-        interrupt = true;
+        interrupt = true
         mediaProjection = null
         virtualDisplay = null
         looper.quit()
@@ -154,9 +143,9 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
             val rowStride = planes[0].rowStride
             val rowPadding = rowStride - pixelStride * width
             val widthPixel = width + rowPadding / pixelStride
-            val bitmap = Bitmap.createBitmap(widthPixel, height, Bitmap.Config.ARGB_8888);
-            bitmap.copyPixelsFromBuffer(buffer);
-            val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height);
+            val bitmap = Bitmap.createBitmap(widthPixel, height, Bitmap.Config.ARGB_8888)
+            bitmap.copyPixelsFromBuffer(buffer)
+            val newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height)
             bitmap.recycle()
             val boss = ByteArrayOutputStream()
             newBitmap.compress(Bitmap.CompressFormat.JPEG, 80, boss)

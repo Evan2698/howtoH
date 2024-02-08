@@ -12,7 +12,6 @@ import android.media.projection.MediaProjectionManager
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -34,10 +33,10 @@ import kotlinx.coroutines.runBlocking
  */
 class MainFragment : Fragment() {
 
-    companion object{
-        private var TAG:String = MainFragment::class.java.simpleName
+    companion object {
+        private var TAG: String = MainFragment::class.java.simpleName
         private var LANDSCAPE_VALUE: Boolean = false
-        private var buttonChecked:Boolean = false
+        private var buttonChecked: Boolean = false
     }
 
     private var _binding: FragmentMainBinding? = null
@@ -45,26 +44,26 @@ class MainFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private var appService :ScreenMirrorService? = null
+    private var appService: ScreenMirrorService? = null
     private var intent: Intent? = null
     private var requestScreenCapture: ActivityResultLauncher<Intent>? = null
     private var requestVpnLauncher: ActivityResultLauncher<Intent>? = null
     private var serviceConnection: AppServiceConnection? = null
-    private var myCast :MyBroadcastReceiver? = null
-    private var cm: DisplayMetrics = DisplayMetrics()
+    private var myCast: MyBroadcastReceiver? = null
 
 
     private inner class AppServiceConnection : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             val binder = service as ScreenMirrorService.MirrorServiceBinder
             appService = binder.service
-            if (!appService!!.isServerRunning()){
+            if (!appService!!.isServerRunning()) {
                 activity?.runOnUiThread {
-                    appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE, cm)
+                    appService?.startService(intent!!, requireContext(), LANDSCAPE_VALUE)
                     startVPN()
                 }
             }
         }
+
         override fun onServiceDisconnected(name: ComponentName) {
             Log.e(TAG, "Service unexpectedly exited")
             appService = null
@@ -72,31 +71,35 @@ class MainFragment : Fragment() {
     }
 
     private inner class MyBroadcastReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent){
-            var value:Int = intent.getIntExtra(ScreenMirrorService.SERVICE_STATUS, -1)
-            when(value){
-                1-> setButtonCheckStatus(true)
-                2->setButtonCheckStatus(false)
-                else->setButtonCheckStatus(false)
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.getIntExtra(ScreenMirrorService.SERVICE_STATUS, -1)) {
+                1 -> setButtonCheckStatus(true)
+                2 -> setButtonCheckStatus(false)
+                else -> setButtonCheckStatus(false)
             }
         }
     }
 
-    private fun registerBroadcast(){
+    private fun registerBroadcast() {
         val filter = IntentFilter()
         filter.addAction(ScreenMirrorService.SERVICE_STATUS_ACTION)
         myCast = MyBroadcastReceiver()
-        ContextCompat.registerReceiver(this.requireContext(), myCast!!, filter,ContextCompat.RECEIVER_NOT_EXPORTED)
+        ContextCompat.registerReceiver(
+            this.requireContext(),
+            myCast!!,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
-    private fun unregisterBroadcast(){
+    private fun unregisterBroadcast() {
         this.requireContext().unregisterReceiver(myCast!!)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         registerLaunch()
         registerBroadcast()
         registerVPNLaunch()
@@ -108,23 +111,21 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.startButton.setOnClickListener {
-            if (binding.startButton.isChecked){
+            if (binding.startButton.isChecked) {
                 this.start()
-            }else {
+            } else {
                 this.stop()
             }
         }
         binding.startButton.setOnCheckedChangeListener { _, isChecked ->
             buttonChecked = isChecked
         }
-        binding.landscapeId.setOnClickListener{
+        binding.landscapeId.setOnClickListener {
             LANDSCAPE_VALUE = true
         }
         binding.portraitId.setOnClickListener {
             LANDSCAPE_VALUE = false
         }
-        // just for api 26
-        this.requireActivity().windowManager.defaultDisplay.getRealMetrics(cm)
     }
 
     override fun onDestroyView() {
@@ -144,13 +145,15 @@ class MainFragment : Fragment() {
         this.activity?.unbindService(serviceConnection!!)
         serviceConnection = null
     }
-    private fun startMediaService(){
+
+    private fun startMediaService() {
         val serviceIntent = Intent(this.context, ScreenMirrorService::class.java)
         serviceIntent.action = ScreenMirrorService.SERVICE_START_ACTION
         ContextCompat.startForegroundService(this.requireContext(), serviceIntent)
         bindService()
     }
-    private fun stopMediaService(){
+
+    private fun stopMediaService() {
         unbindService()
         var serviceIntent = Intent(this.context, ScreenMirrorService::class.java)
         ContextCompat.startForegroundService(this.requireContext(), serviceIntent)
@@ -161,7 +164,7 @@ class MainFragment : Fragment() {
         this.activity?.stopService(serviceIntent)
     }
 
-    private fun requireMediaPermission(){
+    private fun requireMediaPermission() {
         val mediaProjectionManager =
             this.activity?.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         val screenCaptureIntent = mediaProjectionManager.createScreenCaptureIntent()
@@ -170,18 +173,19 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun registerLaunch(){
-        requestScreenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            handleScreenMediaRouting(result)
-        }
+    private fun registerLaunch() {
+        requestScreenCapture =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                handleScreenMediaRouting(result)
+            }
     }
 
-    private fun handleScreenMediaRouting(result: ActivityResult){
-        if (result.resultCode == RESULT_OK){
-            var intent = result.data
+    private fun handleScreenMediaRouting(result: ActivityResult) {
+        if (result.resultCode == RESULT_OK) {
+            val intent = result.data
             this.intent = intent
             startMediaService()
-        }else {
+        } else {
             Log.d(TAG, "cancel the handleScreenMediaRouting!")
         }
     }
@@ -190,7 +194,7 @@ class MainFragment : Fragment() {
         super.onResume()
         binding.landscapeId.isChecked = LANDSCAPE_VALUE
         binding.portraitId.isChecked = !LANDSCAPE_VALUE
-        if (appService == null && ScreenMirrorService.IsServiceRunning){
+        if (appService == null && ScreenMirrorService.IsServiceRunning) {
             bindService()
             Log.d("SM", "bindService")
         }
@@ -203,7 +207,7 @@ class MainFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        if (appService != null){
+        if (appService != null) {
             unbindService()
             Log.d("SM", "unbindService")
         }
@@ -215,11 +219,12 @@ class MainFragment : Fragment() {
     }
 
 
-    private fun start(){
+    private fun start() {
         requireMediaPermission()
     }
-    private fun stop(){
-        if (ScreenMirrorService.IsServiceRunning){
+
+    private fun stop() {
+        if (ScreenMirrorService.IsServiceRunning) {
             stopMediaService()
         }
         shutdownVPN()
@@ -235,11 +240,11 @@ class MainFragment : Fragment() {
 
     private fun startVPN() {
         val vpnIntent = VhostsService.prepare(this.requireContext())
-        if (vpnIntent!= null){
+        if (vpnIntent != null) {
             vpnIntent.let {
                 requestVpnLauncher?.launch(it)
             }
-        }else {
+        } else {
             startVPNService()
         }
 
@@ -248,7 +253,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun startVPNService(){
+    private fun startVPNService() {
         this.activity?.startService(
             Intent(
                 this.context,
@@ -267,23 +272,25 @@ class MainFragment : Fragment() {
             )
         }
     }
-    private fun registerVPNLaunch(){
-        requestVpnLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                startVPNService()
-            } else {
-                Log.d(TAG, "cancel the projection!")
+
+    private fun registerVPNLaunch() {
+        requestVpnLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    startVPNService()
+                } else {
+                    Log.d(TAG, "cancel the projection!")
+                }
             }
-        }
     }
 
-    private  fun isStartAccessibilityService(context: Context, name: String?): Boolean {
+    private fun isStartAccessibilityService(context: Context): Boolean {
         val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
         val serviceInfo =
             am.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
         for (info in serviceInfo) {
             val id = info.id
-            if (id.contains(name!!)) {
+            if (id.contains(".service.ClickAccessibilityService")) {
                 return true
             }
         }
@@ -291,8 +298,9 @@ class MainFragment : Fragment() {
     }
 
     private fun checkMouseClickServiceOpen() {
-        val mouseClickServiceName = ".service.ClickAccessibilityService"
-        val isMouseClickServiceOpen = isStartAccessibilityService(this.requireContext(), mouseClickServiceName)
+
+        val isMouseClickServiceOpen =
+            isStartAccessibilityService(this.requireContext())
         if (isMouseClickServiceOpen) {
             Log.d(TAG, "mouse service is running")
         } else {

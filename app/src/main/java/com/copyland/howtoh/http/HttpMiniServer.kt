@@ -17,7 +17,7 @@ import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.util.Collections
 
-class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
+class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     private val serverPort: Int
     private val imageCache: JPEGCache
     private val connections = Collections.synchronizedSet<WSConnection?>(LinkedHashSet())
@@ -28,6 +28,7 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
 
     companion object {
         private val TAG: String = HttpMiniServer::class.java.simpleName
+        private const val DELAY_TIME:Long = 40
     }
 
     init {
@@ -71,15 +72,15 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
     }
 
 
-    public fun start() {
+    fun start() {
         this.interrupted = false
         httpServer.start(wait = false)
 
-        Thread(Runnable {
+        Thread{
             while (!this.interrupted) {
                 val data = this.imageCache.takeImageFromStream()
                 if (data.size() == 0) {
-                    break;
+                    break
                 }
                 connections.forEach {
                     try {
@@ -90,7 +91,7 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
                         Log.d(TAG, "websocket send failed: ", e)
                     }
                 }
-                sleepMillis(40)
+                sleepMillis()
             }
 
             Log.d("SM", "<------------------------------------------>")
@@ -98,16 +99,16 @@ class HttpMiniServer constructor(port: Int, imageCache: JPEGCache) {
             httpServer.stop()
             Thread.sleep(1000)
             Log.d("SM", "<-----------------HTTP STOP--------------->")
-        }).start()
+        }.start()
     }
 
-    private fun sleepMillis(timeout: Long) {
+    private fun sleepMillis() {
         runBlocking {
-            delay(timeout)
+            delay(DELAY_TIME)
         }
     }
 
-    public fun stop() {
+    fun stop() {
         this.interrupted = true
     }
 }

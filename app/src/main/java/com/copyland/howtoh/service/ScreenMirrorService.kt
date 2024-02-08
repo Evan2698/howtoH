@@ -12,6 +12,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.WindowManager
 import androidx.core.app.NotificationCompat
 import com.copyland.howtoh.MainActivity
 import com.copyland.howtoh.R
@@ -125,8 +126,10 @@ class ScreenMirrorService : Service() {
         this.sendServiceStatus(2)
     }
 
-    fun startService(intent: Intent, context: Context, landscape:Boolean,
-                     cm:DisplayMetrics){
+    fun startService(intent: Intent, context: Context, landscape:Boolean){
+        val cm = DisplayMetrics()
+        val wgr = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        wgr.defaultDisplay.getRealMetrics(cm)
         val widthPixel = cm.widthPixels
         val heightPixel = cm.heightPixels
         RatioHolder.getInstance().screenHeight = heightPixel.toDouble()

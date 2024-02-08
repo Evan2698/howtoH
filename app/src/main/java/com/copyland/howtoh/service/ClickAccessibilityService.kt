@@ -31,7 +31,7 @@ class ClickAccessibilityService: AccessibilityService(), ActionHandler {
     override fun click(x:Double, y:Double){
         val xFloat = x / RatioHolder.getInstance().realWidth *
                 RatioHolder.getInstance().screenWidth
-        var yFloat = y / RatioHolder.getInstance().realHeight *
+        val yFloat = y / RatioHolder.getInstance().realHeight *
                 RatioHolder.getInstance().screenHeight
 
         val cm = Resources.getSystem().displayMetrics
