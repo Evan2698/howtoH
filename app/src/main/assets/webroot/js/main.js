@@ -53,8 +53,16 @@ function removeEvents() {
 }
 
 function onMirrorButtonClick(event) {
-    unInitWebsocket();
-    initWebsocket();
+    try
+    {
+        unInitWebsocket();
+        initWebsocket();
+    }
+    catch(e){
+        alert(e.name + " : " + e.message);
+        document.location.reload();
+    }
+
     var home = document.getElementById("home");
     home.style.visibility = "visible";
     var back = document.getElementById("back");
@@ -89,13 +97,37 @@ function codingKey(key) {
     return "K," + key + ",0";
 }
 
+function translateErrorMessage(state){
+    let message = "";
+    switch(state){
+    case 0:
+        message = "CONNECTING";
+        break;
+    case 1:
+        message ="OPEN";
+        break;
+    case 2:
+        message = "CLOSING";
+        break;
+    case 3:
+        message ="CLOSED";
+        break;        
+    }
+
+    return message;
+}
+
 function initWebsocket() {
     console.log('initWebsocket: init.');
     imageWebsocket = new WebSocket('ws://' + window.location.host + '/tesla');
     imageWebsocket.binaryType = "arraybuffer";
     imageWebsocket.addEventListener("open", (event) => { console.log("websocket was opened.", event); });
     imageWebsocket.addEventListener("message", (event) => { prepareImage(event.data); });
-    imageWebsocket.addEventListener("error", (event) => { console.log("websocket fatal error occured.", event); });
+    imageWebsocket.addEventListener("error", (event) => {
+         console.log("websocket fatal error occured.", event); 
+         alert("Error: " + translateErrorMessage(event.currentTarget.readyState));
+         document.location.reload();
+        });
     imageWebsocket.addEventListener("close", (event) => { console.log("websocket was closed.", event); });
 }
 

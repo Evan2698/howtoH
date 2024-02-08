@@ -75,11 +75,13 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     fun start() {
         this.interrupted = false
         httpServer.start(wait = false)
+        this.imageCache.clear()
 
         Thread{
             while (!this.interrupted) {
                 val data = this.imageCache.takeImageFromStream()
                 if (data.size() == 0) {
+                    Log.d("SM", "image is specified exiting flag for exit!!!!")
                     break
                 }
                 connections.forEach {
@@ -94,7 +96,7 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
                 sleepMillis()
             }
 
-            Log.d("SM", "<------------------------------------------>")
+            Log.d("SM", "<------------------------------------------>${this.interrupted}")
             Thread.sleep(1000)
             httpServer.stop()
             Thread.sleep(1000)
@@ -110,5 +112,6 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
 
     fun stop() {
         this.interrupted = true
+        imageCache.stopCapture()
     }
 }

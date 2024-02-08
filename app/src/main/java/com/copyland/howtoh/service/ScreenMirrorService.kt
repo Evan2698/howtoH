@@ -150,8 +150,8 @@ class ScreenMirrorService : Service() {
         }
         Log.d("SM", "startS x=${cm.widthPixels}, y=${cm.heightPixels}," +
                 " X1=${w}, Y1=${h}")
-        val k = ScreenCapture.builder(intent, context)
-        k.start(w, h)
+        val k = ScreenCapture.getInstance()
+        k.start(w, h, context, intent)
         httpServer = HttpMiniServer(PORT, k)
         httpServer?.start()
         isRunning = true

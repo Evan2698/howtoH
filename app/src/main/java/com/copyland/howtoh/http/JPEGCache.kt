@@ -5,4 +5,8 @@ import java.io.ByteArrayOutputStream
 interface JPEGCache {
     //get a jpeg picture from stream
     fun takeImageFromStream(): ByteArrayOutputStream
+
+    fun clear()
+
+    fun stopCapture()
 }

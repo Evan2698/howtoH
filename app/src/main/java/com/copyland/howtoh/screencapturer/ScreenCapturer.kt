@@ -23,80 +23,67 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 
 
-class ScreenCapture private constructor(intent: Intent, context: Context): JPEGCache {
+class ScreenCapture private constructor(): JPEGCache {
 
     companion object {
         private var TAG: String = ScreenCapture::class.java.simpleName
-        private var intent: Intent? = null
-        private var context: Context? = null
-
-
-
         @Volatile
         private var instance: ScreenCapture? = null
         fun getInstance() =
             instance ?: synchronized(this) {
-                instance ?: ScreenCapture(this.intent!!, this.context!!).also { instance = it }
+                instance ?: ScreenCapture().also { instance = it }
             }
-
-        fun builder(intent: Intent, context: Context): ScreenCapture {
-            this.intent = intent
-            this.context = context
-            return getInstance()
-        }
     }
 
-    private val context: Context
-    private val intent: Intent
+    private var context: Context? = null
+    private var intent: Intent? = null
 
 
     private var mediaProjection: MediaProjection? = null
-    private lateinit var projectionManager: MediaProjectionManager
+    private var projectionManager: MediaProjectionManager?= null
     private var virtualDisplay: VirtualDisplay? = null
-    private lateinit var imageReader: ImageReader
+    private var imageReader: ImageReader? = null
     @Volatile
     private var interrupt: Boolean = false
 
-    private lateinit var handler: Handler
-    private lateinit var looper: Looper
+    private var handler: Handler? = null
+    private var looper: Looper?= null
     private var imageQueue: BlockingQueue<ByteArrayOutputStream> =
         LinkedBlockingQueue(2)
 
-    init {
-        this.intent = intent
-        this.context = context
-        initFunc()
-    }
-
     private fun initFunc() {
         projectionManager =
-            this.context.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
+            this.context?.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                     as MediaProjectionManager
 
-        mediaProjection = projectionManager.getMediaProjection(RESULT_OK, this.intent)
+        mediaProjection = projectionManager?.getMediaProjection(RESULT_OK, this.intent!!)
         mediaProjection?.registerCallback(object : Callback() {
 
         }, null)
-
     }
 
-    fun start(widthPixel: Int, heightPixel: Int) {
+    fun start(widthPixel: Int, heightPixel: Int,context: Context, intent: Intent ) {
         // reset the image queue for application restart.
-        this.imageQueue.clear()
+        this.context = context
+        this.intent = intent
+
+        interrupt = false
+        this.clear()
+        initFunc()
         startActionLoop(widthPixel, heightPixel)
     }
 
     private fun makeCapture(widthPixel: Int, heightPixel: Int) {
         imageReader = ImageReader.newInstance(widthPixel, heightPixel, PixelFormat.RGBA_8888, 1)
-        imageReader.setOnImageAvailableListener({
+        imageReader?.setOnImageAvailableListener({
             captureAction(it)
-        }, handler)
+        }, handler!!)
         virtualDisplay = mediaProjection?.createVirtualDisplay(
             "ScreenCapture",
             widthPixel, heightPixel,
             Resources.getSystem().displayMetrics.densityDpi,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            imageReader.surface, null, handler
+            imageReader?.surface, null, handler!!
         )
     }
 
@@ -104,7 +91,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
         Thread{
             Looper.prepare()
             looper = Looper.myLooper()!!
-            handler = Handler(looper, object :Callback(), Handler.Callback {
+            handler = Handler(looper!!, object :Callback(), Handler.Callback {
                 override fun handleMessage(msg: Message): Boolean {
                     Log.d(TAG, msg.toString())
                     return false
@@ -112,6 +99,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
             })
             makeCapture(widthPixel, heightPixel)
             Looper.loop()
+            Log.d("SM", "Capture loop Exit~~~~~!!!!")
         }.start()
     }
 
@@ -121,8 +109,11 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
         interrupt = true
         mediaProjection = null
         virtualDisplay = null
-        looper.quit()
-        imageQueue.put(ByteArrayOutputStream())
+        looper?.quit()
+        imageReader?.close()
+        imageReader = null
+        looper = null
+        handler = null
     }
 
     private fun captureAction(reader: ImageReader) {
@@ -151,7 +142,12 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
             newBitmap.compress(Bitmap.CompressFormat.JPEG, 80, boss)
             boss.flush()
             newBitmap.recycle()
-            imageQueue.put(boss)
+            if (boss.size() != 0){
+                imageQueue.put(boss)
+            }else {
+                Log.d("SM", "capture empty image array!!!------->")
+            }
+
 
         } catch (e: Exception) {
             Log.d(TAG, "process", e)
@@ -163,6 +159,7 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
         if (interrupt){
             return temp
         }
+
         try {
             temp = imageQueue.take()
         }catch (e: Exception){
@@ -171,5 +168,11 @@ class ScreenCapture private constructor(intent: Intent, context: Context): JPEGC
         return temp
     }
 
+    override fun clear() {
+        imageQueue.clear()
+    }
 
+    override fun stopCapture() {
+        imageQueue.put(ByteArrayOutputStream())
+    }
 }
