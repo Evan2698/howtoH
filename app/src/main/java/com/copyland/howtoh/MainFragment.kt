@@ -241,6 +241,7 @@ class MainFragment : Fragment() {
     private fun startVPN() {
         val vpnIntent = VhostsService.prepare(this.requireContext())
         if (vpnIntent != null) {
+            vpnIntent!!.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             vpnIntent.let {
                 requestVpnLauncher?.launch(it)
             }
@@ -254,22 +255,12 @@ class MainFragment : Fragment() {
     }
 
     private fun startVPNService() {
-        this.activity?.startService(
-            Intent(
-                this.context,
-                VhostsService::class.java
-            ).setAction(VhostsService.ACTION_CONNECT)
-        )
+        VhostsService.startVService(this.requireContext(), 2)
     }
 
     private fun shutdownVPN() {
         if (VhostsService.isRunning()) {
-            this.activity?.startService(
-                Intent(
-                    this.context,
-                    VhostsService::class.java
-                ).setAction(VhostsService.ACTION_DISCONNECT)
-            )
+            VhostsService.stopVService(this.requireContext())
         }
     }
 

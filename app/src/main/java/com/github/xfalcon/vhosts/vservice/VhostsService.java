@@ -226,12 +226,12 @@ public class VhostsService extends VpnService {
     }
 
     public static void startVService(Context context, int method) {
-        Intent intent = VhostsService.prepare(context);
-        if (intent != null) {
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-            LogUtils.e(TAG, "Run Fail On Boot");
-        }
+//        Intent intent = VhostsService.prepare(context);
+//        if (intent != null) {
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            context.startActivity(intent);
+//            LogUtils.e(TAG, "Run Fail On Boot");
+//        }
         try {
             if (method == 2 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 isOAndBoot = true;
