@@ -65,6 +65,7 @@
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="false"
             android:canPerformGestures="true"
+            android:enabled="true"
             android:label="@string/accessibility_description">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
