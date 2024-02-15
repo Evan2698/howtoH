@@ -160,7 +160,9 @@ public class TCPOutput implements Runnable
             {
                 if(tcb.ipAndPort.startsWith(VhostsService.VPN_ADDRESS)){
                     //走隧道, 192.168.1.244:8088
-                    outputChannel.connect(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), destinationPort));
+                    int localPort = destinationPort;
+                    if (localPort == 80) localPort = 8080;
+                    outputChannel.connect(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), localPort));
                 }else{
                     outputChannel.connect(new InetSocketAddress(destinationAddress, destinationPort));
                     tcb.TcpTunnelHead = true;

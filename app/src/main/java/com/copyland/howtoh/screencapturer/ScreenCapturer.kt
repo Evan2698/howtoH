@@ -27,6 +27,7 @@ class ScreenCapture private constructor(): JPEGCache {
 
     companion object {
         private var TAG: String = ScreenCapture::class.java.simpleName
+
         @Volatile
         private var instance: ScreenCapture? = null
         fun getInstance() =
@@ -34,10 +35,6 @@ class ScreenCapture private constructor(): JPEGCache {
                 instance ?: ScreenCapture().also { instance = it }
             }
     }
-
-    private var context: Context? = null
-    private var intent: Intent? = null
-
 
     private var mediaProjection: MediaProjection? = null
     private var projectionManager: MediaProjectionManager?= null
@@ -51,12 +48,12 @@ class ScreenCapture private constructor(): JPEGCache {
     private var imageQueue: BlockingQueue<ByteArrayOutputStream> =
         LinkedBlockingQueue(2)
 
-    private fun initFunc() {
+    private fun initFunc(context: Context?, intent: Intent?) {
         projectionManager =
-            this.context?.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
+            context?.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
                     as MediaProjectionManager
 
-        mediaProjection = projectionManager?.getMediaProjection(RESULT_OK, this.intent!!)
+        mediaProjection = projectionManager?.getMediaProjection(RESULT_OK, intent!!)
         mediaProjection?.registerCallback(object : Callback() {
 
         }, null)
@@ -64,12 +61,9 @@ class ScreenCapture private constructor(): JPEGCache {
 
     fun start(widthPixel: Int, heightPixel: Int,context: Context, intent: Intent ) {
         // reset the image queue for application restart.
-        this.context = context
-        this.intent = intent
-
         interrupt = false
         this.clear()
-        initFunc()
+        initFunc(context, intent)
         startActionLoop(widthPixel, heightPixel)
     }
 

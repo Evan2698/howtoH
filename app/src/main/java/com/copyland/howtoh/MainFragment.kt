@@ -241,7 +241,6 @@ class MainFragment : Fragment() {
     private fun startVPN() {
         val vpnIntent = VhostsService.prepare(this.requireContext())
         if (vpnIntent != null) {
-            vpnIntent!!.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             vpnIntent.let {
                 requestVpnLauncher?.launch(it)
             }
