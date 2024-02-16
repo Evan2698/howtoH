@@ -51,16 +51,18 @@ android {
         resources.excludes.add("META-INF/*")
         resources.excludes.add("META-INF/licenses/*")
     }
+
+
 }
 
 dependencies {
-    var ktor_version = "2.3.7"
-    implementation("androidx.core:core-ktx:1.9.0")
+    val ktor_version = "2.3.8"
+    implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("io.ktor:ktor-server-core:$ktor_version")
     implementation("io.ktor:ktor-server-netty:$ktor_version")
     implementation("io.ktor:ktor-server-websockets:$ktor_version")
