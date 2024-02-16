@@ -168,6 +168,8 @@ public class TCPOutput implements Runnable
                     tcb.TcpTunnelHead = true;
                 }
 
+                LogUtils.i(TAG, "ip port: " + ipAndPort);
+
                 if (outputChannel.finishConnect())
                 {
                     tcb.status = TCBStatus.SYN_RECEIVED;

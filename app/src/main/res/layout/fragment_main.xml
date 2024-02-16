@@ -40,7 +40,7 @@
                 android:layout_marginRight="32dp"
                 android:layout_marginLeft="32dp"
                 android:layout_marginBottom="24dp"
-                android:background="@color/cardview_light_background"
+                android:background="@drawable/bg_button_off"
                 android:padding="12dp">
 
 
