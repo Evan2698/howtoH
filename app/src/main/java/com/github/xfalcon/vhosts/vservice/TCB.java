@@ -1,5 +1,5 @@
 /*
-** Copyright 2015, Mohamed Naufal
+** Copyright 2015, Mohamed Nautical
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -54,15 +54,8 @@ public class TCB
     public boolean TcpTunnelHead = false;
 
     private static final int MAX_CACHE_SIZE = 50; // XXX: Is this ideal?
-    private static LRUCache<String, TCB> tcbCache =
-            new LRUCache<>(MAX_CACHE_SIZE, new LRUCache.CleanupCallback<String, TCB>()
-            {
-                @Override
-                public void cleanup(Map.Entry<String, TCB> eldest)
-                {
-                    eldest.getValue().closeChannel();
-                }
-            });
+    private static final LRUCache<String, TCB> tcbCache =
+            new LRUCache<>(MAX_CACHE_SIZE, eldest -> eldest.getValue().closeChannel());
 
     public static TCB getTCB(String ipAndPort)
     {

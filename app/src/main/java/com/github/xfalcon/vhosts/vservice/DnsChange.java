@@ -1,5 +1,5 @@
 /*
- **Copyright (C) 2017  xfalcon
+ **Copyright (C) 2017  xFalcon
  **
  **This program is free software: you can redistribute it and/or modify
  **it under the terms of the GNU General Public License as published by
@@ -19,18 +19,19 @@
 package com.github.xfalcon.vhosts.vservice;
 
 import com.github.xfalcon.vhosts.util.LogUtils;
-import org.xbill.DNS.*;
-import org.xbill.DNS.Record;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.xbill.DNS.AAAARecord;
+import org.xbill.DNS.ARecord;
+import org.xbill.DNS.Address;
+import org.xbill.DNS.Flags;
+import org.xbill.DNS.Message;
+import org.xbill.DNS.Name;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.Type;
+
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DnsChange {
 
@@ -95,50 +96,13 @@ public class DnsChange {
             packet.swapSourceAndDestination();
             packet.updateUDPBuffer(packet_buffer, packet_buffer.remaining());
             packet_buffer.position(packet_buffer.limit());
-            LogUtils.d(TAG, "hit: " + question.getType() + " :" + query_domain.toString() + " :" + address.getHostName());
+            LogUtils.d(TAG, "hit: " + question.getType() + " :" + query_domain + " :" + address.getHostName());
             return packet_buffer;
         } catch (Exception e) {
             LogUtils.d(TAG, "dns hook error", e);
             return null;
         }
 
-    }
-
-    public static int handle_hosts(InputStream inputStream) {
-        String STR_COMMENT = "#";
-        String HOST_PATTERN_STR = "^\\s*(" + STR_COMMENT + "?)\\s*(\\S*)\\s*([^" + STR_COMMENT + "]*)" + STR_COMMENT + "?(.*)$";
-        Pattern HOST_PATTERN = Pattern.compile(HOST_PATTERN_STR);
-        try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            DOMAINS_IP_MAPS4 = new ConcurrentHashMap<>();
-            DOMAINS_IP_MAPS6 = new ConcurrentHashMap<>();
-            while (!Thread.interrupted() && (line = reader.readLine()) != null) {
-                if (line.length() > 1000 || line.startsWith(STR_COMMENT)) continue;
-                Matcher matcher = HOST_PATTERN.matcher(line);
-                if (matcher.find()) {
-                    String ip = matcher.group(2).trim();
-                    try {
-                        Address.getByAddress(ip);
-                    } catch (Exception e) {
-                        continue;
-                    }
-                    if (ip.contains(":")) {
-                        DOMAINS_IP_MAPS6.put(matcher.group(3).trim() + ".", ip);
-                    } else {
-                        DOMAINS_IP_MAPS4.put(matcher.group(3).trim() + ".", ip);
-                    }
-                }
-            }
-            reader.close();
-            inputStream.close();
-            LogUtils.d(TAG, DOMAINS_IP_MAPS4.toString());
-            LogUtils.d(TAG, DOMAINS_IP_MAPS6.toString());
-            return DOMAINS_IP_MAPS4.size() + DOMAINS_IP_MAPS6.size();
-        } catch (IOException e) {
-            LogUtils.d(TAG, "Hook dns error", e);
-            return 0;
-        }
     }
 
 }

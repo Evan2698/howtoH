@@ -1,5 +1,5 @@
 /*
-** Copyright 2015, Mohamed Naufal
+** Copyright 2015, Mohamed Nautical
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -35,24 +35,17 @@ public class UDPOutput implements Runnable
 {
     private static final String TAG = UDPOutput.class.getSimpleName();
 
-    private VhostsService vpnService;
-    private ConcurrentLinkedQueue<Packet> inputQueue;
-    private ConcurrentLinkedQueue<ByteBuffer> outputQueue;
-    private Selector selector;
-    private ReentrantLock udpSelectorLock;
-    private StringBuilder stringBuild;
+    private final VhostsService vpnService;
+    private final ConcurrentLinkedQueue<Packet> inputQueue;
+    private final ConcurrentLinkedQueue<ByteBuffer> outputQueue;
+    private final Selector selector;
+    private final ReentrantLock udpSelectorLock;
+    private final StringBuilder stringBuild;
 
 
     private static final int MAX_CACHE_SIZE = 50;
-    private LRUCache<String, DatagramChannel> channelCache =
-            new LRUCache<>(MAX_CACHE_SIZE, new LRUCache.CleanupCallback<String, DatagramChannel>()
-            {
-                @Override
-                public void cleanup(Map.Entry<String, DatagramChannel> eldest)
-                {
-                    closeChannel(eldest.getValue());
-                }
-            });
+    private final LRUCache<String, DatagramChannel> channelCache =
+            new LRUCache<>(MAX_CACHE_SIZE, eldest -> closeChannel(eldest.getValue()));
 
     public UDPOutput(ConcurrentLinkedQueue<Packet> inputQueue,ConcurrentLinkedQueue<ByteBuffer> outputQueue, Selector selector,ReentrantLock udpSelectorLock, VhostsService vpnService)
     {

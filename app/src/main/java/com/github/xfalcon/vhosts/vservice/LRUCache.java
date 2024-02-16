@@ -1,5 +1,5 @@
 /*
-** Copyright 2015, Mohamed Naufal
+** Copyright 2015, Mohamed Nautical
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import java.util.LinkedHashMap;
 
 public class LRUCache<K, V> extends LinkedHashMap<K, V>
 {
-    private int maxSize;
-    private CleanupCallback callback;
+    private final int maxSize;
+    private final CleanupCallback<K,V> callback;
 
-    public LRUCache(int maxSize, CleanupCallback callback)
+    public LRUCache(int maxSize, CleanupCallback<K,V> callback)
     {
         super(maxSize + 1, 1, true);
 
@@ -36,14 +36,14 @@ public class LRUCache<K, V> extends LinkedHashMap<K, V>
     {
         if (size() > maxSize)
         {
-            callback.cleanup(eldest);
+            if (callback != null) callback.cleanup(eldest);
             return true;
         }
         return false;
     }
 
-    public static interface CleanupCallback<K, V>
+    public interface CleanupCallback<K, V>
     {
-        public void cleanup(Entry<K, V> eldest);
+        void cleanup(Entry<K, V> eldest);
     }
 }

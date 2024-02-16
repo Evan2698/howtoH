@@ -1,5 +1,5 @@
 /*
-** Copyright 2015, Mohamed Naufal
+** Copyright 2015, Mohamed Nautical
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -34,9 +34,9 @@ public class TCPInput implements Runnable
 {
     private static final String TAG = TCPInput.class.getSimpleName();
 
-    private ConcurrentLinkedQueue<ByteBuffer> outputQueue;
-    private Selector selector;
-    private ReentrantLock tcpSelectorLock;
+    private final ConcurrentLinkedQueue<ByteBuffer> outputQueue;
+    private final Selector selector;
+    private final ReentrantLock tcpSelectorLock;
 
     public TCPInput(ConcurrentLinkedQueue<ByteBuffer> outputQueue, Selector selector,ReentrantLock tcpSelectorLock)
     {
@@ -244,9 +244,8 @@ add by wzl
         tcb.mySequenceNum++; // FIN counts as a byte
 
         try {
-            Packet re = null;
             buffer.position(0);
-            re = new Packet(buffer);
+            Packet re = new Packet(buffer);
             LogUtils.e(TAG, "sendFIN: " + re.ipHeader.destinationAddress.getHostAddress()+":"+re.tcpHeader.destinationPort);
             buffer.position(tcb.referencePacket.IP_TRAN_SIZE);
         } catch (UnknownHostException e) {
@@ -265,9 +264,8 @@ add by wzl
         tcb.referencePacket.updateTCPBuffer(buffer, (byte) (Packet.TCPHeader.RST | Packet.TCPHeader.ACK), tcb.mySequenceNum, tcb.myAcknowledgementNum+prevPayloadSize, 0);
 
         try {
-            Packet re = null;
             buffer.position(0);
-            re = new Packet(buffer);
+            Packet re = new Packet(buffer);
             LogUtils.e(TAG, "sendRST: " + re.ipHeader.destinationAddress.getHostAddress()+":"+re.tcpHeader.destinationPort);
             buffer.position(tcb.referencePacket.IP_TRAN_SIZE);
         } catch (UnknownHostException e) {

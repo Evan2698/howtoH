@@ -1,5 +1,5 @@
 /*
- ** Copyright 2015, Mohamed Naufal
+ ** Copyright 2015, Mohamed Nautical
  **
  ** Licensed under the Apache License, Version 2.0 (the "License");
  ** you may not use this file except in compliance with the License.
@@ -19,12 +19,9 @@ package com.github.xfalcon.vhosts.vservice;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.VpnService;
-import android.os.Build;
 import android.os.ParcelFileDescriptor;
 
 import com.copyland.howtoh.R;
@@ -50,18 +47,18 @@ public class VhostsService extends VpnService {
     private static final String VPN_ADDRESS6 = "2002:0000:0000:0000:0000:0000:0909:0909";
     private static final String VPN_ROUTE = "0.0.0.0"; // Intercept everything
     private static final String VPN_ROUTE6 = "::"; // Intercept everything
-    private static String VPN_DNS4 = "114.114.114.114";
-    private static String VPN_DNS6 = "2002:0000:0000:0000:0000:0000:7272:7272";
+    private static final String VPN_DNS4 = "114.114.114.114";
+    private static final String VPN_DNS6 = "2002:0000:0000:0000:0000:0000:7272:7272";
 
-    public static final String BROADCAST_VPN_STATE = VhostsService.class.getName() + ".VPN_STATE";
+    //public static final String BROADCAST_VPN_STATE = VhostsService.class.getName() + ".VPN_STATE";
     public static final String ACTION_CONNECT = VhostsService.class.getName() + ".START";
     public static final String ACTION_DISCONNECT = VhostsService.class.getName() + ".STOP";
 
     private static boolean isRunning = false;
-    private static Thread threadHandleHosts = null;
+    //private static final Thread threadHandleHosts = null;
     private ParcelFileDescriptor vpnInterface = null;
 
-    private PendingIntent pendingIntent;
+
 
     private ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue;
     private ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
@@ -82,22 +79,20 @@ public class VhostsService extends VpnService {
         super.onCreate();
         if (isOAndBoot) {
             //android 8.0 boot
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel channel = new NotificationChannel("vhosts_channel_id", "System", NotificationManager.IMPORTANCE_NONE);
-                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.createNotificationChannel(channel);
-                Notification notification = new Notification.Builder(this, "vhosts_channel_id")
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("Virtual Hosts Running")
-                        .build();
-                startForeground(1, notification);
-            }
+            NotificationChannel channel = new NotificationChannel("vhosts_channel_id", "System", NotificationManager.IMPORTANCE_NONE);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(channel);
+            Notification notification = new Notification.Builder(this, "vhosts_channel_id")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle("Virtual Hosts Running")
+                    .build();
+            startForeground(1, notification);
             isOAndBoot=false;
         }
         setupHostFile();
         setupVPN();
         if (vpnInterface == null) {
-            LogUtils.d(TAG, "unknow error");
+            LogUtils.d(TAG, "unknown error");
             stopVService();
             return;
         }
@@ -137,25 +132,7 @@ public class VhostsService extends VpnService {
 
 
     private void setupHostFile() {
-//        SharedPreferences settings = getSharedPreferences(VhostsActivity.PREFS_NAME, Context.MODE_PRIVATE);
-//        boolean is_local = settings.getBoolean(VhostsActivity.IS_LOCAL, true);
-//
-//        String uri_path = settings.getString(VhostsActivity.HOSTS_URI, null);
-//        try {
-//            final InputStream inputStream;
-//            if (is_local)
-//                inputStream = getContentResolver().openInputStream(Uri.parse(uri_path));
-//            else inputStream = openFileInput(VhostsActivity.NET_HOST_FILE);
-//
-//            new Thread() {
-//                public void run() {
-//                    DnsChange.handle_hosts(inputStream);
-//                }
-//            }.start();
-//
-//        } catch (Exception e) {
-//            LogUtils.e(TAG, "error setup host file service", e);
-//        }
+
     }
 
     private void setupVPN() {
@@ -174,39 +151,12 @@ public class VhostsService extends VpnService {
 
             builder.addDnsServer(VPN_DNS4);
             builder.addDnsServer(VPN_DNS6);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                String[] whiteList = {"com.android.vending", "com.google.android.apps.docs", "com.google.android.apps.photos", "com.google.android.gm", "com.google.android.apps.translate"};
-                String[] vpnList = {"com.msmsdk.test"};
-                for (String white : vpnList) {
-                    try {
-                        //builder.addDisallowedApplication(white);
-                        builder.addAllowedApplication(white);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        LogUtils.e(TAG, e.getMessage(), e);
-                    }
-                }
-            }
-            vpnInterface = builder.setSession(getString(R.string.app_name)).setConfigureIntent(pendingIntent).establish();
+
+            vpnInterface = builder.setSession(getString(R.string.app_name)).establish();
         }
     }
 
-    private void registerNetReceiver() {
-        //wifi 4G state
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
-//        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-//        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-//        netStateReceiver = new NetworkReceiver();
-//        registerReceiver(netStateReceiver, filter);
 
-    }
-
-    private void unregisterNetReceiver() {
-//        if (netStateReceiver != null) {
-//            unregisterReceiver(netStateReceiver);
-//            netStateReceiver = null;
-//        }
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -226,14 +176,9 @@ public class VhostsService extends VpnService {
     }
 
     public static void startVService(Context context, int method) {
-//        Intent intent = VhostsService.prepare(context);
-//        if (intent != null) {
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            context.startActivity(intent);
-//            LogUtils.e(TAG, "Run Fail On Boot");
-//        }
+
         try {
-            if (method == 2 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (method == 2) {
                 isOAndBoot = true;
                 context.startForegroundService(new Intent(context, VhostsService.class).setAction(ACTION_CONNECT));
             } else {
@@ -250,8 +195,6 @@ public class VhostsService extends VpnService {
     }
 
     private void stopVService() {
-        if (threadHandleHosts != null) threadHandleHosts.interrupt();
-//        unregisterNetReceiver();
         if (executorService != null) executorService.shutdownNow();
         isRunning = false;
         cleanup();
@@ -297,11 +240,11 @@ public class VhostsService extends VpnService {
     private static class VPNRunnable implements Runnable {
         private static final String TAG = VPNRunnable.class.getSimpleName();
 
-        private FileDescriptor vpnFileDescriptor;
+        private final FileDescriptor vpnFileDescriptor;
 
-        private ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue;
-        private ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
-        private ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue;
+        private final  ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue;
+        private final ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
+        private final ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue;
 
         public VPNRunnable(FileDescriptor vpnFileDescriptor,
                            ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue,

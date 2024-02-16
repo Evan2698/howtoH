@@ -1,5 +1,5 @@
 /*
-** Copyright 2015, Mohamed Naufal
+** Copyright 2015, Mohamed Nautical
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -37,17 +37,17 @@ public class TCPOutput implements Runnable
 {
     private static final String TAG = TCPOutput.class.getSimpleName();
 
-    private VhostsService vpnService;
+    private final VhostsService vpnService;
 
     //deviceToNetworkTCPQueue
-    private ConcurrentLinkedQueue<Packet> inputQueue;
+    private final ConcurrentLinkedQueue<Packet> inputQueue;
 
     //networkToDeviceQueue
-    private ConcurrentLinkedQueue<ByteBuffer> outputQueue;
-    private Selector selector;
-    private ReentrantLock tcpSelectorLock;
+    private final ConcurrentLinkedQueue<ByteBuffer> outputQueue;
+    private final Selector selector;
+    private final ReentrantLock tcpSelectorLock;
 
-    private Random random = new Random();
+    private final Random random = new Random();
     public TCPOutput(ConcurrentLinkedQueue<Packet> inputQueue, ConcurrentLinkedQueue<ByteBuffer> outputQueue,
                      Selector selector,ReentrantLock tcpSelectorLock, VhostsService vpnService)
     {
@@ -178,7 +178,7 @@ public class TCPOutput implements Runnable
                 }
                 else
                 {
-                    //LogUtils.e(TAG, "connect unfinish:" + ipAndPort);
+                    //LogUtils.e(TAG, "connect unfinished:" + ipAndPort);
 
                     tcb.status = TCBStatus.SYN_SENT;
                     tcpSelectorLock.lock();
@@ -216,6 +216,8 @@ public class TCPOutput implements Runnable
 
     private void processDuplicateSYN(TCB tcb, TCPHeader tcpHeader, ByteBuffer responseBuffer)
     {
+
+
         synchronized (tcb)
         {
             if (tcb.status == TCBStatus.SYN_SENT)
@@ -262,16 +264,16 @@ public class TCPOutput implements Runnable
             String targetHost = "TARGET_HOST:" + ip[0]+":"+ip[1]+ "\n";
             int payloadSize = payloadBuffer.limit() - payloadBuffer.position();
             byte[] originData = new byte[payloadSize];
-            int postion = payloadBuffer.position();
+            int position = payloadBuffer.position();
             payloadBuffer.get(originData);
-            payloadBuffer.position(postion);
+            payloadBuffer.position(position);
 
-            payloadBuffer.limit(postion + payloadSize + targetHost.getBytes().length);
+            payloadBuffer.limit(position + payloadSize + targetHost.getBytes().length);
 
             payloadBuffer.put(targetHost.getBytes());
             payloadBuffer.put(originData);
 
-            payloadBuffer.position(postion);
+            payloadBuffer.position(position);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -348,9 +350,8 @@ public class TCPOutput implements Runnable
         tcb.referencePacket.updateTCPBuffer(buffer, (byte) (TCPHeader.RST |  Packet.TCPHeader.ACK), tcb.mySequenceNum, tcb.myAcknowledgementNum + prevPayloadSize, 0);
 
         try {
-            Packet re = null;
             buffer.position(0);
-            re = new Packet(buffer);
+            Packet re = new Packet(buffer);
             LogUtils.e(TAG, "sendRST: " + re.ipHeader.destinationAddress.getHostAddress()+":"+re.tcpHeader.destinationPort);
             buffer.position(tcb.referencePacket.IP_TRAN_SIZE);
         } catch (UnknownHostException e) {
@@ -370,9 +371,9 @@ public class TCPOutput implements Runnable
         tcb.mySequenceNum++; // FIN counts as a byte
 
         try {
-            Packet re = null;
+
             buffer.position(0);
-            re = new Packet(buffer);
+            Packet re = new Packet(buffer);
             LogUtils.e(TAG, "sendRST: " + re.ipHeader.destinationAddress.getHostAddress()+":"+re.tcpHeader.destinationPort);
             buffer.position(tcb.referencePacket.IP_TRAN_SIZE);
         } catch (UnknownHostException e) {
