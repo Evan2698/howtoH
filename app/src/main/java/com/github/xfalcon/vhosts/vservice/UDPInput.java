@@ -1,5 +1,5 @@
 /*
-** Copyright 2015, Mohamed Nautical
+** Copyright 2015, Mohamed Naufal
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ public class UDPInput implements Runnable
 {
     private static final String TAG = UDPInput.class.getSimpleName();
 
-    private final Selector selector;
-    private final ReentrantLock udpSelectorLock;
-    private final ConcurrentLinkedQueue<ByteBuffer> outputQueue;
+    private Selector selector;
+    private ReentrantLock udpSelectorLock;
+    private ConcurrentLinkedQueue<ByteBuffer> outputQueue;
 
     public UDPInput(ConcurrentLinkedQueue<ByteBuffer> outputQueue, Selector selector, ReentrantLock udpSelectorLock)
     {

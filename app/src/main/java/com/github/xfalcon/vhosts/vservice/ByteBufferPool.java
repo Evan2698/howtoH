@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ByteBufferPool
 {
     private static final int BUFFER_SIZE = 16384; // XXX: Is this ideal?
-    private static final ConcurrentLinkedQueue<ByteBuffer> pool = new ConcurrentLinkedQueue<>();
+    private static ConcurrentLinkedQueue<ByteBuffer> pool = new ConcurrentLinkedQueue<>();
 
     public static ByteBuffer acquire()
     {

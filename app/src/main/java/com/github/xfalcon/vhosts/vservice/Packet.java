@@ -19,8 +19,6 @@ package com.github.xfalcon.vhosts.vservice;
 
 import com.github.xfalcon.vhosts.util.LogUtils;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
@@ -76,7 +74,6 @@ public class Packet {
     }
 
     @Override
-    @NotNull
     public String toString() {
         final StringBuilder sb = new StringBuilder("Packet{");
         sb.append("IpHeader=").append(ipHeader);
@@ -233,17 +230,17 @@ public class Packet {
     }
 
     public static class IP4Header extends IPHeader {
-        private final byte IHL;
-        private final int headerLength;
-        private final short typeOfService;
+        private byte IHL;
+        private int headerLength;
+        private short typeOfService;
 
-        private final int identificationAndFlagsAndFragmentOffset;
+        private int identificationAndFlagsAndFragmentOffset;
 
-        private final short TTL;
+        private short TTL;
         private int headerChecksum;
-        private final static byte[] addressBytes = new byte[4];
+        private static byte[] addressBytes = new byte[4];
 
-        //public int optionsAndPadding;
+        public int optionsAndPadding;
 
 
         private IP4Header(ByteBuffer buffer, byte version, byte IHL, int headerLength) throws UnknownHostException {
@@ -307,28 +304,27 @@ public class Packet {
         }
 
         @Override
-        @NotNull
         public String toString() {
-            final StringBuilder builder = new StringBuilder("IP4Header{");
-            builder.append("version=").append(version);
-            builder.append(", IHL=").append(IHL);
-            builder.append(", typeOfService=").append(typeOfService);
-            builder.append(", totalLength=").append(totalLength);
-            builder.append(", identificationAndFlagsAndFragmentOffset=").append(identificationAndFlagsAndFragmentOffset);
-            builder.append(", TTL=").append(TTL);
-            builder.append(", protocol=").append(protocol);
-            builder.append(", headerChecksum=").append(headerChecksum);
-            builder.append(", sourceAddress=").append(sourceAddress.getHostAddress());
-            builder.append(", destinationAddress=").append(destinationAddress.getHostAddress());
-            builder.append('}');
-            return builder.toString();
+            final StringBuilder sb = new StringBuilder("IP4Header{");
+            sb.append("version=").append(version);
+            sb.append(", IHL=").append(IHL);
+            sb.append(", typeOfService=").append(typeOfService);
+            sb.append(", totalLength=").append(totalLength);
+            sb.append(", identificationAndFlagsAndFragmentOffset=").append(identificationAndFlagsAndFragmentOffset);
+            sb.append(", TTL=").append(TTL);
+            sb.append(", protocol=").append(protocol);
+            sb.append(", headerChecksum=").append(headerChecksum);
+            sb.append(", sourceAddress=").append(sourceAddress.getHostAddress());
+            sb.append(", destinationAddress=").append(destinationAddress.getHostAddress());
+            sb.append('}');
+            return sb.toString();
         }
     }
 
     public static class IP6Header extends IPHeader {
-        private final long versionTrafficFlowLabel;
-        private final byte hotLimit;
-        private static final byte[] addressBytes = new byte[16];
+        private long versionTrafficFlowLabel;
+        private byte hotLimit;
+        private static byte[] addressBytes = new byte[16];
 
         private IP6Header(ByteBuffer buffer, byte version) throws UnknownHostException {
             this.version = version;
@@ -361,11 +357,10 @@ public class Packet {
         }
 
         @Override
-        @NotNull
         public String toString() {
             final StringBuilder sb = new StringBuilder("IP6Header{");
             sb.append("version=").append(version);
-            sb.append(", trafficClassFlowLabel=").append(versionTrafficFlowLabel);
+            sb.append(", trafficClassFlowLable=").append(versionTrafficFlowLabel);
             sb.append(", payload=").append(totalLength);
             sb.append(", protocol=").append(protocol);
             sb.append(", hotLimit=").append(hotLimit);
@@ -392,14 +387,14 @@ public class Packet {
         public long acknowledgementNumber;
 
         private byte dataOffsetAndReserved;
-        private final int headerLength;
+        private int headerLength;
         private byte flags;
-        private final int window;
+        private int window;
 
         private int checksum;
-        private final int urgentPointer;
+        private int urgentPointer;
 
-
+        private byte[] optionsAndPadding;
 
         private TCPHeader(ByteBuffer buffer) {
             this.sourcePort = BitUtils.getUnsignedShort(buffer.getShort());
@@ -418,7 +413,7 @@ public class Packet {
 
             int optionsLength = this.headerLength - TCP_HEADER_SIZE;
             if (optionsLength > 0) {
-                byte[] optionsAndPadding = new byte[optionsLength];
+                optionsAndPadding = new byte[optionsLength];
                 buffer.get(optionsAndPadding, 0, optionsLength);
             }
         }
@@ -470,7 +465,6 @@ public class Packet {
         }
 
         @Override
-        @NotNull
         public String toString() {
             final StringBuilder sb = new StringBuilder("TCPHeader{");
             sb.append("sourcePort=").append(sourcePort);
@@ -516,7 +510,6 @@ public class Packet {
         }
 
         @Override
-        @NotNull
         public String toString() {
             final StringBuilder sb = new StringBuilder("UDPHeader{");
             sb.append("sourcePort=").append(sourcePort);

@@ -1,5 +1,5 @@
 /*
- ** Copyright 2015, Mohamed Nautical
+ ** Copyright 2015, Mohamed Naufal
  **
  ** Licensed under the Apache License, Version 2.0 (the "License");
  ** you may not use this file except in compliance with the License.
@@ -19,9 +19,12 @@ package com.github.xfalcon.vhosts.vservice;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.VpnService;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 
 import com.copyland.howtoh.R;
@@ -58,7 +61,7 @@ public class VhostsService extends VpnService {
     //private static final Thread threadHandleHosts = null;
     private ParcelFileDescriptor vpnInterface = null;
 
-
+    private PendingIntent pendingIntent;
 
     private ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue;
     private ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
@@ -151,8 +154,19 @@ public class VhostsService extends VpnService {
 
             builder.addDnsServer(VPN_DNS4);
             builder.addDnsServer(VPN_DNS6);
-
-            vpnInterface = builder.setSession(getString(R.string.app_name)).establish();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                String[] whiteList = {"com.android.vending", "com.google.android.apps.docs", "com.google.android.apps.photos", "com.google.android.gm", "com.google.android.apps.translate"};
+                String[] vpnList = {"com.msmsdk.test"};
+                for (String white : vpnList) {
+                    try {
+                        //builder.addDisallowedApplication(white);
+                        builder.addAllowedApplication(white);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        LogUtils.e(TAG, e.getMessage(), e);
+                    }
+                }
+            }
+            vpnInterface = builder.setSession(getString(R.string.app_name)).setConfigureIntent(pendingIntent).establish();
         }
     }
 
@@ -240,11 +254,11 @@ public class VhostsService extends VpnService {
     private static class VPNRunnable implements Runnable {
         private static final String TAG = VPNRunnable.class.getSimpleName();
 
-        private final FileDescriptor vpnFileDescriptor;
+        private FileDescriptor vpnFileDescriptor;
 
-        private final  ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue;
-        private final ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
-        private final ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue;
+        private ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue;
+        private ConcurrentLinkedQueue<Packet> deviceToNetworkTCPQueue;
+        private ConcurrentLinkedQueue<ByteBuffer> networkToDeviceQueue;
 
         public VPNRunnable(FileDescriptor vpnFileDescriptor,
                            ConcurrentLinkedQueue<Packet> deviceToNetworkUDPQueue,

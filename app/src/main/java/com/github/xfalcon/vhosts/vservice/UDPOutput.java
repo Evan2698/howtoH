@@ -1,5 +1,5 @@
 /*
-** Copyright 2015, Mohamed Nautical
+** Copyright 2015, Mohamed Naufal
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -35,17 +35,24 @@ public class UDPOutput implements Runnable
 {
     private static final String TAG = UDPOutput.class.getSimpleName();
 
-    private final VhostsService vpnService;
-    private final ConcurrentLinkedQueue<Packet> inputQueue;
-    private final ConcurrentLinkedQueue<ByteBuffer> outputQueue;
-    private final Selector selector;
-    private final ReentrantLock udpSelectorLock;
-    private final StringBuilder stringBuild;
+    private VhostsService vpnService;
+    private ConcurrentLinkedQueue<Packet> inputQueue;
+    private ConcurrentLinkedQueue<ByteBuffer> outputQueue;
+    private Selector selector;
+    private ReentrantLock udpSelectorLock;
+    private StringBuilder stringBuild;
 
 
     private static final int MAX_CACHE_SIZE = 50;
-    private final LRUCache<String, DatagramChannel> channelCache =
-            new LRUCache<>(MAX_CACHE_SIZE, eldest -> closeChannel(eldest.getValue()));
+    private LRUCache<String, DatagramChannel> channelCache =
+            new LRUCache<>(MAX_CACHE_SIZE, new LRUCache.CleanupCallback<String, DatagramChannel>()
+            {
+                @Override
+                public void cleanup(Map.Entry<String, DatagramChannel> eldest)
+                {
+                    closeChannel(eldest.getValue());
+                }
+            });
 
     public UDPOutput(ConcurrentLinkedQueue<Packet> inputQueue,ConcurrentLinkedQueue<ByteBuffer> outputQueue, Selector selector,ReentrantLock udpSelectorLock, VhostsService vpnService)
     {
@@ -87,9 +94,8 @@ public class UDPOutput implements Runnable
                     vpnService.protect(outputChannel.socket());
                     try
                     {
-                        if (ipAndPort.startsWith(VhostsService.VPN_ADDRESS)){
-                            InetAddress localAddress = InetAddress.getByName("127.0.0.1");
-                            outputChannel.connect(new InetSocketAddress(localAddress, destinationPort));
+                        if(ipAndPort.startsWith(VhostsService.VPN_ADDRESS)){
+                            outputChannel.connect(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), destinationPort));
                         }else {
                             outputChannel.connect(new InetSocketAddress(destinationAddress, destinationPort));
                         }
