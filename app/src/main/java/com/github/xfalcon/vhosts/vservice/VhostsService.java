@@ -26,6 +26,7 @@ import android.content.pm.PackageManager;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
 
 import com.copyland.howtoh.R;
 import com.github.xfalcon.vhosts.util.LogUtils;
@@ -335,10 +336,11 @@ public class VhostsService extends VpnService {
                 LogUtils.i(TAG, "Stopping", e);
             } catch (IOException e) {
                 LogUtils.w(TAG, e.toString(), e);
-            } finally {
+            } catch (Exception e){
+                LogUtils.w(TAG, e.toString(), e);
+            }finally {
                 closeResources(vpnInput, vpnOutput);
             }
-
             LogUtils.d(TAG, "VPN routine is END!!!!");
         }
     }

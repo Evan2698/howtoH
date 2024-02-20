@@ -12,6 +12,9 @@ import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -79,10 +82,6 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     fun start() {
         this.interrupted = false
         this.imageCache.clear()
-
-        Thread{
-            httpServer.start(wait = true)
-        }.start()
         Thread{
             while (!this.interrupted) {
                 val data = this.imageCache.takeImageFromStream()
@@ -108,15 +107,28 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
             }
             connections.clear();
             Log.d("SM", "<------------------------------------------>${this.interrupted}")
+            httpServer.stop()
+            Thread.sleep(1000)
             Log.d("SM", "<-----------------HTTP STOP--------------->")
         }.start()
+
+
+        CoroutineScope(Dispatchers.IO).launch(CoroutineExceptionHandler { _, throwable ->
+            Log.d(TAG, throwable.message.toString())
+        }) {
+            launch {
+                httpServer.start(wait = true)
+            }
+        }
     }
 
     private fun notifiedEveryWebsocket(
         item: WSConnection,
         data: ByteArrayOutputStream
     ) {
-        GlobalScope.launch {
+        GlobalScope.launch(CoroutineExceptionHandler { _, throwable ->
+            Log.d(TAG, throwable.message.toString())
+        }) {
             try {
                 item.session.send(Frame.Binary(true, data.toByteArray()))
             } catch (e: Exception) {
@@ -130,7 +142,6 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     }
 
     fun stop() {
-        httpServer.stop()
         this.interrupted = true
         imageCache.stopCapture()
     }
