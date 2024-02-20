@@ -40,7 +40,7 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
         embeddedServer(Netty, this.serverPort) {
             install(WebSockets) {
                 pingPeriod = Duration.ofSeconds(15)
-                timeout = Duration.ofSeconds(15)
+                timeout = Duration.ofSeconds(10)
                 maxFrameSize = Long.MAX_VALUE
                 masking = false
             }

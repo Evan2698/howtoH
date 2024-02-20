@@ -30,7 +30,7 @@
                 android:text="@string/urls_header"
                 android:textAlignment="center"
                 android:textColor="#4a4a4a"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:id="@+id/urlLinerLayout"
@@ -62,7 +62,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="5dp"
                             android:text="@string/url_address_name"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textColor="#4a4a4a"/>
 
                         <TextView
@@ -71,7 +71,7 @@
                             android:layout_height="wrap_content"
                             android:text="@string/url_address"
                             android:layout_marginLeft="10dp"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             android:textColor="#5BA4ED"/>
 
                     </LinearLayout>
