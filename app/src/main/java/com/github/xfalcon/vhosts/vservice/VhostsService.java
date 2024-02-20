@@ -332,7 +332,7 @@ public class VhostsService extends VpnService {
                         Thread.sleep(11);
                 }
             } catch (InterruptedException e) {
-                LogUtils.i(TAG, "Stopping");
+                LogUtils.i(TAG, "Stopping", e);
             } catch (IOException e) {
                 LogUtils.w(TAG, e.toString(), e);
             } finally {

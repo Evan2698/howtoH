@@ -12,10 +12,14 @@ import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.ByteArrayOutputStream
 import java.time.Duration
 import java.util.Collections
+import kotlin.concurrent.thread
 
 class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     private val serverPort: Int
@@ -61,9 +65,9 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
                         }
                     } catch (e: Exception) {
                         Log.d(TAG, "websocket error", e)
-                        e.printStackTrace()
+                        //e.printStackTrace()
                     } finally {
-                        println("Removing $thisConnection!")
+                        Log.w(TAG,"Removing socket and clear the environment variables")
                         connections -= thisConnection
                     }
                 }
@@ -74,9 +78,11 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
 
     fun start() {
         this.interrupted = false
-        httpServer.start(wait = false)
         this.imageCache.clear()
 
+        Thread{
+            httpServer.start(wait = true)
+        }.start()
         Thread{
             while (!this.interrupted) {
                 val data = this.imageCache.takeImageFromStream()
@@ -84,33 +90,47 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
                     Log.d("SM", "image is specified exiting flag for exit!!!!")
                     break
                 }
-                connections.forEach {
+                for (item: WSConnection in connections){
                     try {
-                        runBlocking {
-                            it.session.send(Frame.Binary(true, data.toByteArray()))
-                        }
-                    } catch (e: Exception) {
-                        Log.d(TAG, "websocket send failed: ", e)
+                        notifiedEveryWebsocket(item, data)
+                    }
+                    catch ( e: Exception){
+                        Log.d("SM", "Global notified failed:", e)
+                    }
+                    if (this.interrupted){
+                        break
                     }
                 }
-                sleepMillis()
-            }
 
+                if (!this.interrupted){
+                    sleepMillis()
+                }
+            }
+            connections.clear();
             Log.d("SM", "<------------------------------------------>${this.interrupted}")
-            Thread.sleep(1000)
-            httpServer.stop()
-            Thread.sleep(1000)
             Log.d("SM", "<-----------------HTTP STOP--------------->")
         }.start()
     }
 
-    private fun sleepMillis() {
-        runBlocking {
-            delay(DELAY_TIME)
+    private fun notifiedEveryWebsocket(
+        item: WSConnection,
+        data: ByteArrayOutputStream
+    ) {
+        GlobalScope.launch {
+            try {
+                item.session.send(Frame.Binary(true, data.toByteArray()))
+            } catch (e: Exception) {
+                Log.d(TAG, "websocket send internal: ", e)
+            }
         }
     }
 
+    private fun sleepMillis() {
+        Thread.sleep(DELAY_TIME)
+    }
+
     fun stop() {
+        httpServer.stop()
         this.interrupted = true
         imageCache.stopCapture()
     }
