@@ -53,12 +53,11 @@ function removeEvents() {
 }
 
 function onMirrorButtonClick(event) {
-    try
-    {
+    try {
         unInitWebsocket();
         initWebsocket();
     }
-    catch(e){
+    catch (e) {
         alert(e.name + " : " + e.message);
         document.location.reload();
     }
@@ -97,38 +96,29 @@ function codingKey(key) {
     return "K," + key + ",0";
 }
 
-function translateErrorMessage(state){
-    let message = "";
-    switch(state){
-    case 0:
-        message = "CONNECTING";
-        break;
-    case 1:
-        message ="OPEN";
-        break;
-    case 2:
-        message = "CLOSING";
-        break;
-    case 3:
-        message ="CLOSED";
-        break;        
-    }
-
-    return message;
-}
 
 function initWebsocket() {
     console.log('initWebsocket: init.');
-    imageWebsocket = new WebSocket('ws://' + window.location.host + '/tesla');
-    imageWebsocket.binaryType = "arraybuffer";
-    imageWebsocket.addEventListener("open", (event) => { console.log("websocket was opened.", event); });
-    imageWebsocket.addEventListener("message", (event) => { prepareImage(event.data); });
-    imageWebsocket.addEventListener("error", (event) => {
-         console.log("websocket fatal error occured.", event); 
-         alert("Error: " + translateErrorMessage(event.currentTarget.readyState));
-         document.location.reload();
-        });
-    imageWebsocket.addEventListener("close", (event) => { console.log("websocket was closed.", event); });
+
+    if (imageWebsocket != null) return;
+
+    const url = 'ws://' + window.location.host + '/tesla';
+    imageWebsocket = new WebsocketHeartbeatJs({
+        url: url,
+        pingTimeout: 8000,
+        pongTimeout: 8000
+    });
+
+    imageWebsocket.onopen = function () {
+        console.log('websocket is open!!!!');
+    };
+
+    imageWebsocket.onmessage = function (e) {
+        prepareImage(e.data);
+    };
+    imageWebsocket.onreconnect = function () {
+        console.log('websocket reconnected once!!');
+    }
 }
 
 function unInitWebsocket() {
@@ -263,10 +253,12 @@ function sendMouseMessage(message) {
     if (imageWebsocket == null)
         return;
 
-    if (imageWebsocket.readyState === WebSocket.OPEN) {
+    try {
         var msg = message;
         imageWebsocket.send(msg);
-        //console.log(msg);
+    } catch (e) {
+        console.log(e);
     }
+
 }
 
