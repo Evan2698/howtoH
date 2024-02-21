@@ -11,6 +11,7 @@ import io.ktor.server.websocket.pingPeriod
 import io.ktor.server.websocket.timeout
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -105,9 +106,17 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
                     sleepMillis()
                 }
             }
+            for (item: WSConnection in connections){
+                GlobalScope.launch(CoroutineExceptionHandler { _, throwable ->
+                    Log.d(TAG, throwable.message.toString())
+                }) {
+                    item.session?.close()
+                }
+            }
+
             connections.clear();
             Log.d("SM", "<------------------------------------------>${this.interrupted}")
-            httpServer.stop()
+            httpServer.stop(2000, 5000)
             Thread.sleep(1000)
             Log.d("SM", "<-----------------HTTP STOP--------------->")
         }.start()
