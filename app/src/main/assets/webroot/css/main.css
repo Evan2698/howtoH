@@ -42,13 +42,16 @@ body {
   letter-spacing: 0.25rem;
   color: #edf0f0;
   text-align: center;
-  padding: 20px;  
+  padding: 0px;
+  margin: 0px;
 }
 
 .separator{
   width: 30px;
 }
-
+.container-margin {
+  margin: 18px 0px 0px 0px;
+}
 .button {
   background-color: #04AA6D;
   border: none;
