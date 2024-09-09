@@ -1,6 +1,6 @@
 body {
   background-color: #292929;
-  height: 98vh;
+  height: 99vh;
   margin: 0;
   padding: 0;
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -53,14 +53,15 @@ body {
   background-color: #04AA6D;
   border: none;
   color: white;
-  padding: 8px 24px;
+  padding: 0px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 14px;
-  margin: 10px;
+  font-size: 16px;
+  margin: 0px;
   cursor: pointer;
   width: 120px;
+  height:30px;
 }
 
 .image-screen {
