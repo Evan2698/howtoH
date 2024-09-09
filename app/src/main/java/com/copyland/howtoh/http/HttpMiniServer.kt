@@ -15,6 +15,7 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -80,6 +81,7 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     }
 
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun start() {
         this.interrupted = false
         this.imageCache.clear()
@@ -110,7 +112,7 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
                 GlobalScope.launch(CoroutineExceptionHandler { _, throwable ->
                     Log.d(TAG, throwable.message.toString())
                 }) {
-                    item.session?.close()
+                    item.session.close()
                 }
             }
 
@@ -131,6 +133,7 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun notifiedEveryWebsocket(
         item: WSConnection,
         data: ByteArrayOutputStream
