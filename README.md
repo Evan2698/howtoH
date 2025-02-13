@@ -13,6 +13,6 @@ API是33以及以上。
 # 
 因为这个原型项目或多或少使用了参考了以下项目，因此感谢，但是又没有商业化，所以就只能列表感谢
 感谢列表：
-xbill DNS  https://github.com/dnsjava/dnsjava/
-ktor  https://ktor.io/
+* xbill DNS  https://github.com/dnsjava/dnsjava/
+* ktor  https://ktor.io/
 
