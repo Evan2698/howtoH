@@ -18,13 +18,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 import java.time.Duration
 import java.util.Collections
-import kotlin.concurrent.thread
 
 class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     private val serverPort: Int
