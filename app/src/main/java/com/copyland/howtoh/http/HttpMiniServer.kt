@@ -20,8 +20,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
-import java.time.Duration
 import java.util.Collections
+import kotlin.time.Duration.Companion.seconds
 
 class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     private val serverPort: Int
@@ -45,8 +45,8 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache) {
     private val httpServer by lazy {
         embeddedServer(Netty, this.serverPort) {
             install(WebSockets) {
-                pingPeriod = Duration.ofSeconds(15)
-                timeout = Duration.ofSeconds(10)
+                pingPeriod = 15.seconds
+                timeout = 15.seconds
                 maxFrameSize = Long.MAX_VALUE
                 masking = false
             }

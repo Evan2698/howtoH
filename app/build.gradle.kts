@@ -56,7 +56,7 @@ android {
 }
 
 dependencies {
-    val ktor_version = "2.3.8"
+    val ktor_version = "3.2.3"
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
