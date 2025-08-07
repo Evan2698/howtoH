@@ -155,7 +155,7 @@ class ScreenMirrorService : Service() {
                 " X1=${w}, Y1=${h}")
         val k = ScreenCapture.getInstance()
         k.start(w, h, context, intent)
-        httpServer = HttpMiniServer(PORT, k)
+        httpServer = HttpMiniServer(PORT, k, context)
         httpServer?.start()
         isRunning = true
     }
