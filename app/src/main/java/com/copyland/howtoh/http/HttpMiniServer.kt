@@ -92,15 +92,15 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache, context: Context) {
             port = serverPort
         }
 
-        sslConnector(
-            keyStore = keyStore,
-            keyAlias = "sampleAlias",
-            keyStorePassword = { "123456".toCharArray() },
-            privateKeyPassword = { "foobar".toCharArray() }) {
-            port = 8443
-            keyStorePath = keyStoreFile
-
-        }
+//        sslConnector(
+//            keyStore = keyStore,
+//            keyAlias = "sampleAlias",
+//            keyStorePassword = { "123456".toCharArray() },
+//            privateKeyPassword = { "foobar".toCharArray() }) {
+//            port = 8443
+//            keyStorePath = keyStoreFile
+//
+//        }
     }
 
     fun  buildserver():EmbeddedServer<NettyApplicationEngine, io. ktor. server. netty. NettyApplicationEngine. Configuration>{

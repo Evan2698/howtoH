@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
@@ -239,6 +240,10 @@ class MainFragment : Fragment() {
     }
 
     private fun startVPN() {
+
+
+
+
         val vpnIntent = VhostsService.prepare(this.requireContext())
         if (vpnIntent != null) {
             vpnIntent.let {
