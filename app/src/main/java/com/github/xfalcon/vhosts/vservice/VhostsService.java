@@ -23,6 +23,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
@@ -141,6 +144,7 @@ public class VhostsService extends VpnService {
 
     private void setupVPN() {
         if (vpnInterface == null) {
+
             Builder builder = new Builder();
             builder.addAddress(VPN_ADDRESS, 32);
             builder.addAddress(VPN_ADDRESS6, 128);
@@ -152,6 +156,16 @@ public class VhostsService extends VpnService {
             //tcp走vpn
             builder.addRoute(VPN_ROUTE,0);
             builder.addRoute(VPN_ROUTE6,0);
+
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            Network[] networks = cm.getAllNetworks();
+            if (networks.length > 0){
+                try {
+                    builder.setUnderlyingNetworks(networks);
+                } catch (Exception e){
+                    Log.e("MyVPN", "Permission denied to set underlying networks.", e);
+                }
+            }
 
             builder.addDnsServer(VPN_DNS4);
             builder.addDnsServer(VPN_DNS6);

@@ -72,19 +72,19 @@ class HttpMiniServer(port: Int, imageCache: JPEGCache, context: Context) {
 //        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
 //        trustManagerFactory.init(null as KeyStore?)
 
-        val keyStoreFile = File("build/keystore.jks")
-        val keyStore = buildKeyStore {
-            certificate("sampleAlias") {
-                password = "foobar"
-                domains = listOf("127.0.0.1", "0.0.0.0", "localhost")
-            }
-        }
-        try {
-            keyStore.saveToFile(keyStoreFile, "123456")
-        }
-        catch ( e: Exception){
-            Log.d(TAG, "File save exception", e)
-        }
+//        val keyStoreFile = File("build/keystore.jks")
+//        val keyStore = buildKeyStore {
+//            certificate("sampleAlias") {
+//                password = "foobar"
+//                domains = listOf("127.0.0.1", "0.0.0.0", "localhost")
+//            }
+//        }
+//        try {
+//            keyStore.saveToFile(keyStoreFile, "123456")
+//        }
+//        catch ( e: Exception){
+//            Log.d(TAG, "File save exception", e)
+//        }
 
 
 

@@ -44,9 +44,12 @@ public class Packet {
     private boolean isTCP;
     private boolean isUDP;
 
+    private final static String TAG ="VPN PACKET";
+
     public Packet(ByteBuffer buffer) throws UnknownHostException {
         byte versionAndIHL = buffer.get();
         byte version = (byte) (versionAndIHL >> 4);
+        LogUtils.d("VPN PACKET", "version: " + version);
         if (version == 4) {
             IP_HEADER_SIZE = IP4_HEADER_SIZE;
             byte IHL = (byte) (versionAndIHL & 0x0F);
@@ -61,6 +64,7 @@ public class Packet {
             this.isUDP = false;
             return;
         }
+        LogUtils.d(TAG, "protocol: " + this.ipHeader.protocol);
         if (this.ipHeader.protocol == TCP) {
             this.tcpHeader = new TCPHeader(buffer);
             this.isTCP = true;
