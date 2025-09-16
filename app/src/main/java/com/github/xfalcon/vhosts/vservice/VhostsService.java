@@ -191,15 +191,15 @@ public class VhostsService extends VpnService {
     }
 
     private void callSetHotspotTrafficAllowed(){
-        try {
-            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            Class<?> clazz = cm.getClass();
-            Method method = clazz.getDeclaredMethod("setHotspotTrafficAllowed", boolean.class);
-            method.setAccessible(true);
-            method.invoke(cm, true); // 允许热点流量
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+//            Class<?> clazz = cm.getClass();
+//            Method method = clazz.getDeclaredMethod("setHotspotTrafficAllowed", boolean.class);
+//            method.setAccessible(true);
+//            method.invoke(cm, true); // 允许热点流量
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 
