@@ -39,6 +39,7 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.Selector;
@@ -169,6 +170,10 @@ public class VhostsService extends VpnService {
 
             builder.addDnsServer(VPN_DNS4);
             builder.addDnsServer(VPN_DNS6);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                callSetHotspotTrafficAllowed();
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 String[] whiteList = {"com.android.vending", "com.google.android.apps.docs", "com.google.android.apps.photos", "com.google.android.gm", "com.google.android.apps.translate"};
                 String[] vpnList = {"com.msmsdk.test"};
@@ -182,6 +187,18 @@ public class VhostsService extends VpnService {
                 }
             }
             vpnInterface = builder.setSession(getString(R.string.app_name)).setConfigureIntent(pendingIntent).establish();
+        }
+    }
+
+    private void callSetHotspotTrafficAllowed(){
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            Class<?> clazz = cm.getClass();
+            Method method = clazz.getDeclaredMethod("setHotspotTrafficAllowed", boolean.class);
+            method.setAccessible(true);
+            method.invoke(cm, true); // 允许热点流量
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
