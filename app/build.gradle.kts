@@ -5,13 +5,13 @@ plugins {
 
 android {
     namespace = "com.copyland.howtoh"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.copyland.howtoh"
         minSdk = 26
         //noinspection OldTargetApi
-        targetSdk = 33
+        targetSdk = 35
         versionCode = 1
         versionName = "3.1"
 
