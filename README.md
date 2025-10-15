@@ -16,3 +16,5 @@ API是33以及以上。
 * xbill DNS  https://github.com/dnsjava/dnsjava/
 * ktor  https://ktor.io/
 
+# 只支持android 14 以下的设备，因为android 14 开始 热点数据流和WiFi数据流是分开的。这个是为了安全。所以android14 以上需要
+root 自己建立路由后使用。
